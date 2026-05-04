@@ -20,7 +20,6 @@ void main(
 	// These values come from one of the VertexFormats::sVertex_mesh that the vertex buffer was filled with in C code
 	in const float3 i_position : POSITION,
 	in const float4 i_color : COLOR,
-	in const float2 i_texture : TEXCOORD,
 
 	// Output
 	//=======
@@ -28,8 +27,7 @@ void main(
 	// An SV_POSITION value must always be output from every vertex shader
 	// so that the GPU can figure out which fragments need to be shaded
 	out float4 o_position : SV_POSITION,
-	out float4 o_color : COLOR,
-	out float2 o_texture : TEXCOORD
+	out float4 o_color : COLOR
 
 )
 {
@@ -37,7 +35,6 @@ void main(
 	// the actual shading code is never used
 	o_position = float4( i_position, 1.0 );
 	o_color = float4(i_color.r, i_color.g, i_color.b, i_color.a);
-	o_texture = float2(i_texture);
 }
 
 #elif defined( EAE6320_PLATFORM_GL )
@@ -74,6 +71,7 @@ void main()
 {
 	// The shader program is only used by Direct3D
 	gl_Position = vec4( i_position, 1.0 );
+	//o_color = vec4(i_color);
 }
 
 #endif

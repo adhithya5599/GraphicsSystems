@@ -30,23 +30,19 @@ void main(
 	// These values come from one of the VertexFormats::sVertex_mesh that the vertex buffer was filled with in C code
 	in const float3 i_vertexPosition_local : POSITION,
 	in const float4 i_vertexColor_local : COLOR,
-	in const float2 i_texcoord_local : TEXCOORD,
 	// Output
 	//=======
 
 	// An SV_POSITION value must always be output from every vertex shader
 	// so that the GPU can figure out which fragments need to be shaded
 	out float4 o_vertexPosition_projected : SV_POSITION,
-	out float4 o_vertexColor_projected : COLOR,
-	out float2 o_texcoord_projected : TEXCOORD
+	out float4 o_vertexColor_projected : COLOR
 
 )
 #elif defined( EAE6320_PLATFORM_GL )
 layout( location = 0 ) in vec3 i_vertexPosition_local;
 layout( location = 1 ) in vec4 i_vertexColor_local;
 layout( location = 1 ) out vec4 o_vertexColor_projected;
-layout( location = 2 ) in vec2 i_texcoord_local;
-layout( location = 2 ) out vec2 o_texcoord_projected;
 void main()
 #endif
 {
@@ -68,9 +64,5 @@ void main()
 	//Assign input color to the output color
 	{
 		o_vertexColor_projected = float4(i_vertexColor_local);
-	}
-	//Assign the texture
-	{
-		o_texcoord_projected = float2(i_texcoord_local);
 	}
 }

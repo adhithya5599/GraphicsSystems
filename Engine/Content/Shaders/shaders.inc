@@ -24,8 +24,6 @@
 	#define vec4 float4
 	#define TransfromVector(i_vector1, i_vector2) mul(i_vector1, i_vector2)
 	#define gl_Position o_vertexPosition_projected
-	#define DeclareTexture( i_name, i_id ) Texture2D i_name : register( t##i_id );SamplerState i_name##_Sampler : register( s##i_id)
-	#define SamplerTexture( i_name, i_uv ) i_name.Sample( i_name##_Sampler, i_uv )
 
 #elif defined( EAE6320_PLATFORM_GL )
 
@@ -36,8 +34,6 @@
 	#define float4 vec4
 	#define TransfromVector(i_vector1, i_vector2) i_vector1 * i_vector2
 	#define o_vertexPosition_projected gl_Position
-	#define DeclareTexture( i_name, i_id ) layout( binding = i_id ) uniform sampler2D i_name
-	#define SamplerTexture( i_name, i_uv ) texture( i_name, i_uv )
 
 #endif
 

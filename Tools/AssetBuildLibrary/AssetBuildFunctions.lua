@@ -288,23 +288,6 @@ NewAssetTypeInfo( "meshes",
 	}
 )
 
--- Texture Asset Type
---------------------
-NewAssetTypeInfo( "textures",
-	{
-		ConvertSourceRelativePathToBuiltRelativePath = function( i_sourceRelativePath )
-			-- Change the source file extension to the binary version
-			local relativeDirectory, file = i_sourceRelativePath:match( "(.-)([^/\\]+)$" )
-			local fileName, extensionWithPeriod = file:match( "([^%.]+)(.*)" )
-			-- By default the relative paths are the same
-			return relativeDirectory .. fileName .. extensionWithPeriod
-		end,
-		GetBuilderRelativePath = function()
-			return "TextureBuilder.exe"
-		end
-	}
-)
-
 -- Local Function Definitions
 --===========================
 
