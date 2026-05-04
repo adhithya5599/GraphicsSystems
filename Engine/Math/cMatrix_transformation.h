@@ -59,6 +59,16 @@ namespace eae6320
 			static constexpr cMatrix_transformation ConcatenateAffine(
 				const cMatrix_transformation& i_nextTransform, const cMatrix_transformation& i_firstTransform );
 
+			static constexpr cMatrix_transformation CreateScale(float scaleX, float scaleY, float scaleZ)
+			{
+				return cMatrix_transformation(
+					scaleX, 0.0f, 0.0f, 0.0f,
+					0.0f, scaleY, 0.0f, 0.0f,
+					0.0f, 0.0f, scaleZ, 0.0f,
+					0.0f, 0.0f, 0.0f, 1.0f
+				);
+			}
+
 			// Access
 			//-------
 
@@ -66,6 +76,11 @@ namespace eae6320
 			const sVector& GetUpDirection() const;
 			const sVector& GetBackDirection() const;
 			const sVector& GetTranslation() const;
+			void SetLocation(const eae6320::Math::sVector& i_location);
+			void SetRotation(const eae6320::Math::cQuaternion& i_rotation);
+			eae6320::Math::sVector GetLocation() const;
+			eae6320::Math::cQuaternion GetRotation() const;
+			void Translate(const eae6320::Math::sVector& i_vector);
 
 			// Camera
 			//-------

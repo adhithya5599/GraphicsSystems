@@ -34,10 +34,11 @@ eae6320::cResult eae6320::Texture::cTexture::InitializeTexture()
 	}
 
 	{
-		constexpr GLint format = GL_BGRA;
+		GLint format = (m_componentsPerPixel == 4) ? GL_BGRA : GL_BGR;
+		GLint internalFormat = (m_componentsPerPixel == 4) ? GL_RGBA8 : GL_RGB8;
 		constexpr GLint level = 0;
 		constexpr GLint border = 0;
-		glTexImage2D(GL_TEXTURE_2D, level, format, m_width, m_height, border, 
+		glTexImage2D(GL_TEXTURE_2D, level, internalFormat, m_width, m_height, border, 
 			format, GL_UNSIGNED_BYTE, m_pixels);
 		const auto errorCode = glGetError();
 		if (errorCode == GL_NO_ERROR)

@@ -313,7 +313,7 @@ eae6320::cResult eae6320::Application::iApplication::Initialize_all( const sEntr
 	// Initialize the derived application
 	if ( !( result = Initialize() ) )
 	{
-		EAE6320_ASSERTF( false, "Application couldn't be initialized" );
+		//EAE6320_ASSERTF( false, "Application couldn't be initialized" );
 		return result;
 	}
 

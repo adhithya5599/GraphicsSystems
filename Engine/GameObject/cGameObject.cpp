@@ -4,7 +4,6 @@
 #include <Engine/Graphics/cEffect.h>
 #include <Engine/Math/cMatrix_transformation.h>
 #include <Engine/ScopeGuard/cScopeGuard.h>
-#include <Engine/Physics/sRigidBodyState.h>
 
 eae6320::GameObject::cMyGameObject::cMyGameObject(Graphics::cMesh*& o_mesh, Graphics::cEffect*& o_effect)
 {
@@ -36,32 +35,17 @@ eae6320::GameObject::cMyGameObject::cMyGameObject(Graphics::cMesh*& o_mesh, Grap
 				o_mesh = nullptr;
 			}
 		});
-	m_RigidBodyState = new Physics::sRigidBodyState();
-	m_RigidBodyState->position = Math::sVector(0.0f, 0.0f, 0.0f);
-}
-
-eae6320::Graphics::cMesh*& eae6320::GameObject::cMyGameObject::GetMesh()
-{
-	return m_Mesh;
-}
-
-eae6320::Graphics::cEffect*& eae6320::GameObject::cMyGameObject::GetEffect()
-{
-	return m_Effect;
-}
-
-eae6320::Physics::sRigidBodyState* eae6320::GameObject::cMyGameObject::GetRigidBodyState()
-{
-	return m_RigidBodyState;
+	//m_RigidBodyState = new Physics::sRigidBodyState();
+	//m_RigidBodyState->position = Math::sVector(0.0f, 0.0f, 0.0f);
 }
 
 eae6320::GameObject::cMyGameObject::~cMyGameObject()
 {
 	auto result = Results::Success;
-	if (m_RigidBodyState)
-	{
-		delete m_RigidBodyState;
-	}
+	//if (m_RigidBodyState)
+	//{
+	//	delete m_RigidBodyState;
+	//}
 
 	if (m_Mesh)
 	{

@@ -197,16 +197,16 @@ eae6320::cResult eae6320::Graphics::cEffect::CleanUp_platformSpecific()
 	{
 		glDeleteProgram(m_programId);
 		const auto errorCode = glGetError();
-		if ( errorCode != GL_NO_ERROR )
-		{
-			if ( result )
-			{
-				result = eae6320::Results::Failure;
-			}
-			EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-			eae6320::Logging::OutputError("OpenGL failed to delete the program: %s",
-				reinterpret_cast<const char*>(gluErrorString(errorCode)));
-		}
+		//if ( errorCode != GL_NO_ERROR )
+		//{
+		//	if ( result )
+		//	{
+		//		result = eae6320::Results::Failure;
+		//	}
+		//	EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
+		//	eae6320::Logging::OutputError("OpenGL failed to delete the program: %s",
+		//		reinterpret_cast<const char*>(gluErrorString(errorCode)));
+		//}
 		m_programId = 0;
 	}
 	

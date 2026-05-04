@@ -75,7 +75,10 @@ namespace eae6320
 				D = 0x44, 
 
 				Z = 0x5A,
-				O = 0x4F
+				O = 0x4F,
+				P = 0x50,
+				F = 0x46,
+				E = 0x45
 			};
 		}
 	}

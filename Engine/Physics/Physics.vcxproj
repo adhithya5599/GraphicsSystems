@@ -19,10 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="sRigidBodyState.cpp" />
+    <ClCompile Include="Collisions.cpp" />
+    <ClCompile Include="cPhysicsBody2D.cpp" />
+    <ClCompile Include="cPhysicsWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="sRigidBodyState.h" />
+    <ClInclude Include="AABB.h" />
+    <ClInclude Include="Collisions.h" />
+    <ClInclude Include="cPhysicsBody2D.h" />
+    <ClInclude Include="cPhysicsWorld.h" />
+    <ClInclude Include="cRigidBody2D.h" />
+    <ClInclude Include="PhysicsManifold.h" />
+    <ClInclude Include="PhysicsUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Math\Math.vcxproj">

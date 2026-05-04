@@ -63,6 +63,7 @@ namespace eae6320
 		void OutputWarningMessageForVisualStudio( const char* const i_errorMessage, const char* const i_optionalFilePath = nullptr,
 			const unsigned int* const i_optionalLineNumber = nullptr, const unsigned int* const i_optionalColumnNumber = nullptr );
 		cResult WriteBinaryFile( const char* const i_path, const void* const i_data, const size_t i_size, std::string* const o_errorMessage = nullptr );
+		std::string GetAppDataFolderPath();
 	}
 }
 

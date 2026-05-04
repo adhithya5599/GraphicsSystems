@@ -10,7 +10,7 @@
 #include <Engine/Graphics/cEffect.h>
 #include <Engine/GameObject/cGameObject.h>
 #include <Engine/Math/cMatrix_transformation.h>
-#include <Engine/Physics/sRigidBodyState.h>
+//#include <Engine/Physics/sRigidBodyState.h>
 #include <Engine/GameObject/cCamera.h>
 #include <Engine/Texture/cTexture.h>
 
@@ -59,32 +59,32 @@ void eae6320::cMyGame::SubmitDataToBeRendered(const float i_elapsedSecondCount_s
 	Graphics::SubmitBackgroundColorForANewFrame(0.5f, 0.0f, 1.0f);
 
 	{
-		auto& predictedCameraTransform = camera->GetRigidBodyState()->PredictFutureTransform(i_elapsedSecondCount_sinceLastSimulationUpdate);
-		Graphics::SubmitCameraDataForANewFrame(camera, predictedCameraTransform);
+		//auto& predictedCameraTransform = camera->GetRigidBodyState()->PredictFutureTransform(i_elapsedSecondCount_sinceLastSimulationUpdate);
+		//Graphics::SubmitCameraDataForANewFrame(camera, predictedCameraTransform);
 	}
 
-	auto& predictedTransform = playerObject->GetRigidBodyState()->PredictFutureTransform(i_elapsedSecondCount_sinceLastSimulationUpdate);
-	auto& planeTransform = planeObject->GetRigidBodyState()->PredictFutureTransform(i_elapsedSecondCount_sinceLastSimulationUpdate);
-	auto& anotherTransform = anotherObject->GetRigidBodyState()->PredictFutureTransform(i_elapsedSecondCount_sinceLastSimulationUpdate);
+	//auto& predictedTransform = playerObject->GetRigidBodyState()->PredictFutureTransform(i_elapsedSecondCount_sinceLastSimulationUpdate);
+	//auto& planeTransform = planeObject->GetRigidBodyState()->PredictFutureTransform(i_elapsedSecondCount_sinceLastSimulationUpdate);
+	//auto& anotherTransform = anotherObject->GetRigidBodyState()->PredictFutureTransform(i_elapsedSecondCount_sinceLastSimulationUpdate);
 
-	if (bIsBackspacePressed)
-	{
-		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(playerObject->GetMesh(),
-			planeObject->GetEffect(), predictedTransform, waterTexture, 0);
-		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(planeObject->GetMesh(),
-			planeObject->GetEffect(), planeTransform, grassTexture, 0);
-		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(anotherObject->GetMesh(),
-			planeObject->GetEffect(), anotherTransform, lensTexture, 0);
-	}
-	else
-	{
-		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(playerObject->GetMesh(), 
-			playerObject->GetEffect(), predictedTransform, noTexture, 0);
-		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(planeObject->GetMesh(), 
-			planeObject->GetEffect(), planeTransform, groundTexture, 0);
-		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(anotherObject->GetMesh(), 
-			anotherObject->GetEffect(), anotherTransform, noTexture, 0);
-	}
+	//if (bIsBackspacePressed)
+	//{
+	//	Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(playerObject->GetMesh(),
+	//		planeObject->GetEffect(), predictedTransform, waterTexture, 0);
+	//	Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(planeObject->GetMesh(),
+	//		planeObject->GetEffect(), planeTransform, grassTexture, 0);
+	//	Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(anotherObject->GetMesh(),
+	//		planeObject->GetEffect(), anotherTransform, lensTexture, 0);
+	//}
+	//else
+	//{
+	//	Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(playerObject->GetMesh(), 
+	//		playerObject->GetEffect(), predictedTransform, noTexture, 0);
+	//	Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(planeObject->GetMesh(), 
+	//		planeObject->GetEffect(), planeTransform, groundTexture, 0);
+	//	Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(anotherObject->GetMesh(), 
+	//		anotherObject->GetEffect(), anotherTransform, noTexture, 0);
+	//}
 }
 
 void eae6320::cMyGame::UpdateBasedOnInput()
@@ -101,9 +101,9 @@ void eae6320::cMyGame::UpdateBasedOnInput()
 
 void eae6320::cMyGame::UpdateSimulationBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate)
 {
-	camera->GetRigidBodyState()->Update(i_elapsedSecondCount_sinceLastUpdate);
+	//camera->GetRigidBodyState()->Update(i_elapsedSecondCount_sinceLastUpdate);
 
-	playerObject->GetRigidBodyState()->Update(i_elapsedSecondCount_sinceLastUpdate);
+	//playerObject->GetRigidBodyState()->Update(i_elapsedSecondCount_sinceLastUpdate);
 }
 
 void eae6320::cMyGame::UpdateSimulationBasedOnInput()
@@ -113,30 +113,30 @@ void eae6320::cMyGame::UpdateSimulationBasedOnInput()
 	else
 		bIsBackspacePressed = false;
 
-	if (UserInput::IsKeyPressed(UserInput::KeyCodes::Up))
-		playerObject->GetRigidBodyState()->velocity = { 0.0f, 10.0f, 0.0f };
-	
-	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Down))
-		playerObject->GetRigidBodyState()->velocity = { 0.0f, -10.f, 0.0f };
-	
-	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Left))
-		playerObject->GetRigidBodyState()->velocity = { -10.0f, 0.0f, 0.0f };
-	
-	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Right))
-		playerObject->GetRigidBodyState()->velocity = { 10.0f, 0.f, 0.0f };
-	else
-		playerObject->GetRigidBodyState()->velocity = { 0.0f, 0.0f, 0.0f };
+	//if (UserInput::IsKeyPressed(UserInput::KeyCodes::Up))
+	//	playerObject->GetRigidBodyState()->velocity = { 0.0f, 10.0f, 0.0f };
+	//
+	//else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Down))
+	//	playerObject->GetRigidBodyState()->velocity = { 0.0f, -10.f, 0.0f };
+	//
+	//else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Left))
+	//	playerObject->GetRigidBodyState()->velocity = { -10.0f, 0.0f, 0.0f };
+	//
+	//else if (UserInput::IsKeyPressed(UserInput::KeyCodes::Right))
+	//	playerObject->GetRigidBodyState()->velocity = { 10.0f, 0.f, 0.0f };
+	//else
+	//	playerObject->GetRigidBodyState()->velocity = { 0.0f, 0.0f, 0.0f };
 
-	if (UserInput::IsKeyPressed(UserInput::KeyCodes::W))
-		camera->GetRigidBodyState()->velocity = {0.0f, -1.0f, 0.f};
-	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::A))
-		camera->GetRigidBodyState()->velocity = { 1.0f, 0.f, 0.f };
-	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::S))
-		camera->GetRigidBodyState()->velocity = { 0.0f, 1.f, 0.f };
-	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::D))
-		camera->GetRigidBodyState()->velocity = { -1.0f, 0.f, 0.f };
-	else
-		camera->GetRigidBodyState()->velocity = {0.f, 0.f, 0.f};
+	//if (UserInput::IsKeyPressed(UserInput::KeyCodes::W))
+	//	camera->GetRigidBodyState()->velocity = {0.0f, -1.0f, 0.f};
+	//else if (UserInput::IsKeyPressed(UserInput::KeyCodes::A))
+	//	camera->GetRigidBodyState()->velocity = { 1.0f, 0.f, 0.f };
+	//else if (UserInput::IsKeyPressed(UserInput::KeyCodes::S))
+	//	camera->GetRigidBodyState()->velocity = { 0.0f, 1.f, 0.f };
+	//else if (UserInput::IsKeyPressed(UserInput::KeyCodes::D))
+	//	camera->GetRigidBodyState()->velocity = { -1.0f, 0.f, 0.f };
+	//else
+	//	camera->GetRigidBodyState()->velocity = {0.f, 0.f, 0.f};
 
 }
 

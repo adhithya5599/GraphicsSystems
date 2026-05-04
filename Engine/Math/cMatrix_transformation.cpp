@@ -34,6 +34,100 @@ const eae6320::Math::sVector& eae6320::Math::cMatrix_transformation::GetTranslat
 	return *reinterpret_cast<const sVector*>( &m_03 );
 }
 
+void eae6320::Math::cMatrix_transformation::SetLocation(const eae6320::Math::sVector& i_location)
+{
+	m_03 = i_location.x;
+	m_13 = i_location.y;
+	m_23 = i_location.z;
+}
+
+void eae6320::Math::cMatrix_transformation::SetRotation(const eae6320::Math::cQuaternion& i_rotation)
+{
+	const float w = i_rotation.m_w;
+	const float x = i_rotation.m_x;
+	const float y = i_rotation.m_y;
+	const float z = i_rotation.m_z;
+
+	const float xx = x * x;
+	const float yy = y * y;
+	const float zz = z * z;
+	const float xy = x * y;
+	const float xz = x * z;
+	const float yz = y * z;
+	const float wx = w * x;
+	const float wy = w * y;
+	const float wz = w * z;
+
+	m_00 = 1.0f - 2.0f * (yy + zz);
+	m_10 = 2.0f * (xy + wz);
+	m_20 = 2.0f * (xz - wy);
+	m_30 = 0.0f;
+
+	m_01 = 2.0f * (xy - wz);
+	m_11 = 1.0f - 2.0f * (xx + zz);
+	m_21 = 2.0f * (yz + wx);
+	m_31 = 0.0f;
+
+	m_02 = 2.0f * (xz + wy);
+	m_12 = 2.0f * (yz - wx);
+	m_22 = 1.0f - 2.0f * (xx + yy);
+	m_32 = 0.0f;
+}
+
+eae6320::Math::sVector eae6320::Math::cMatrix_transformation::GetLocation() const
+{
+	return eae6320::Math::sVector(m_03, m_13, m_23);
+}
+
+eae6320::Math::cQuaternion eae6320::Math::cMatrix_transformation::GetRotation() const
+{
+	float w, x, y, z;
+
+	const float trace = m_00 + m_11 + m_22;
+
+	if (trace > 0.0f)
+	{
+		const float s = std::sqrt(trace + 1.0f) * 2.0f; // s = 4 * w
+		w = 0.25f * s;
+		x = (m_21 - m_12) / s;
+		y = (m_02 - m_20) / s;
+		z = (m_10 - m_01) / s;
+	}
+	else if ((m_00 > m_11) && (m_00 > m_22))
+	{
+		const float s = std::sqrt(1.0f + m_00 - m_11 - m_22) * 2.0f; // s = 4 * x
+		w = (m_21 - m_12) / s;
+		x = 0.25f * s;
+		y = (m_01 + m_10) / s;
+		z = (m_02 + m_20) / s;
+	}
+	else if (m_11 > m_22)
+	{
+		const float s = std::sqrt(1.0f + m_11 - m_00 - m_22) * 2.0f; // s = 4 * y
+		w = (m_02 - m_20) / s;
+		x = (m_01 + m_10) / s;
+		y = 0.25f * s;
+		z = (m_12 + m_21) / s;
+	}
+	else
+	{
+		const float s = std::sqrt(1.0f + m_22 - m_00 - m_11) * 2.0f; // s = 4 * z
+		w = (m_10 - m_01) / s;
+		x = (m_02 + m_20) / s;
+		y = (m_12 + m_21) / s;
+		z = 0.25f * s;
+	}
+
+	return cQuaternion(w, x, y, z);
+}
+
+void eae6320::Math::cMatrix_transformation::Translate(const eae6320::Math::sVector& i_vector)
+{
+	m_03 += i_vector.x;
+	m_13 += i_vector.y;
+	m_23 += i_vector.z;
+}
+
 // Camera
 //-------
 
