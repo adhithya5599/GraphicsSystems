@@ -1,0 +1,17 @@
+return
+{
+	vertexCount = 4,
+	triangleCount = 6,
+	vertex =
+	{
+		{ name = "vertex Position 1 ", x = -2.500000, y = -1.000000, z = -5.000000, colorAt = "vertex 1 Color ", r = 1.000000, g = 1.000000, b = 1.000000, a = 1.000000, u = 0.000000, v = 1.000000 }, 
+		{ name = "vertex Position 2 ", x = 2.500000, y = -1.000000, z = -5.000000, colorAt = "vertex 2 Color ", r = 1.000000, g = 1.000000, b = 1.000000, a = 1.000000, u = 0.500000, v = 1.000000 }, 
+		{ name = "vertex Position 3 ", x = -2.500000, y = -1.000000, z = 5.000000, colorAt = "vertex 3 Color ", r = 1.000000, g = 1.000000, b = 1.000000, a = 1.000000, u = 0.000000, v = 0.000000 }, 
+		{ name = "vertex Position 4 ", x = 2.500000, y = -1.000000, z = 5.000000, colorAt = "vertex 4 Color ", r = 1.000000, g = 1.000000, b = 1.000000, a = 1.000000, u = 0.500000, v = 0.000000 }, 
+	},
+	index =
+	{
+		0, 2, 1, 
+		2, 3, 1, 
+	}
+}
