@@ -85,7 +85,7 @@ namespace eae6320
 
 			// Initialize / Clean Up
 			//----------------------
-			cResult InitializeViews(const sInitializationParameters& i_initializationParameters);
+
 			cResult Initialize( const sInitializationParameters& i_initializationParameters );
 			cResult CleanUp();
 

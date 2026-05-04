@@ -8,7 +8,6 @@
 #include "sContext.h"
 
 #include <Engine/Results/Results.h>
-#include <Engine/Assets/ReferenceCountedAssets.h>
 
 #ifdef EAE6320_PLATFORM_GL
 #include "OpenGL/Includes.h"
@@ -21,29 +20,20 @@ namespace eae6320
 		class cEffect
 		{
 			public:
-				//Factory function to initialize the effect object
-				static cResult Load(cEffect*& o_effect, const std::string& i_vertexShaderPath, const std::string& i_fragmentShaderPath);
+				cResult InitializeShadingData(const std::string &i_vertexShaderPath, const std::string &i_fragmentShaderPath);
+				cResult CleanUp();
 
-				EAE6320_ASSETS_DECLAREREFERENCECOUNTINGFUNCTIONS();
-				EAE6320_ASSETS_DECLAREDELETEDREFERENCECOUNTEDFUNCTIONS(cEffect);
-
+				cResult Initialize_platformSpecific();
+				cResult CleanUp_platformSpecific();
 				void Bind();
 
 			private:
-				EAE6320_ASSETS_DECLAREREFERENCECOUNT();
 				cShader* m_vertexShader = nullptr;
 				cShader* m_fragmentShader = nullptr;
 				cRenderState m_renderState;
 #if EAE6320_PLATFORM_GL
 				GLuint m_programId = 0;
-#endif // EAE6320_PLATFORM_GL	
-				cResult InitializeShadingData(const std::string& i_vertexShaderPath, const std::string& i_fragmentShaderPath);
-				cResult CleanUp();
-
-				cResult Initialize_platformSpecific();
-				cResult CleanUp_platformSpecific();
-				cEffect() = default;
-				~cEffect();
+#endif // EAE6320_PLATFORM_GL			
 		};
 	}
 }

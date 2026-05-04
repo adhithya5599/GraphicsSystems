@@ -75,32 +75,6 @@ namespace eae6320
 			}
 		};
 
-		//This is used to load image files
-		struct sImageData
-		{
-			uint8_t* pixels = nullptr;
-			uint32_t width = 0;
-			uint32_t height = 0;
-			uint8_t componentsPerPixel = 0; //3 for RGB, 4 for RGBA
-			sImageData() = default;
-			sImageData(const sImageData& io_movedFrom)
-				: pixels(io_movedFrom.pixels), width(io_movedFrom.width), height(io_movedFrom.height),
-				componentsPerPixel(io_movedFrom.componentsPerPixel)
-			{
-			}
-			~sImageData()
-			{
-				if (pixels)
-				{
-					free(pixels);
-					pixels = nullptr;
-				}
-				width = 0;
-				height = 0;
-				componentsPerPixel = 0;
-			}
-		};
-
 		cResult CopyFile( const char* const i_path_source, const char* const i_path_target,
 			const bool i_shouldFunctionFailIfTargetAlreadyExists = false, const bool i_shouldTargetFileTimeBeModified = false,
 			std::string* o_errorMessage = nullptr );

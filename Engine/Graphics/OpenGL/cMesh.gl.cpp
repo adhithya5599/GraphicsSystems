@@ -117,7 +117,6 @@ eae6320::cResult eae6320::Graphics::cMesh::InitializeGeometry(eae6320::Graphics:
 		// The "stride" defines how large a single vertex is in the stream of data
 		// (or, said another way, how far apart each position element is)
 		constexpr auto stride = static_cast<GLsizei>(sizeof(eae6320::Graphics::VertexFormats::sVertex_mesh));
-		//constexpr auto colorStride = static_cast<GLsizei>(sizeof(eae6320::Graphics::VertexFormats::sVertex_color));
 			
 		// Position (0)
 		// 3 floats == 12 bytes
@@ -151,74 +150,14 @@ eae6320::cResult eae6320::Graphics::cMesh::InitializeGeometry(eae6320::Graphics:
 				return result;
 			}
 		}
-		
-		//COLOR (1)
-		//3 Unsigned int 8 bits == 3 bytes
-		//Offset = 12
-		{
-			constexpr GLuint vertexElementLocation = 1;
-			constexpr GLint elementCount = 4;
-			constexpr GLboolean notNormalized = GL_TRUE;	// The given values should be between 0-1
-			glVertexAttribPointer(vertexElementLocation, elementCount, GL_UNSIGNED_BYTE, notNormalized, stride,
-				reinterpret_cast<GLvoid*>(offsetof(eae6320::Graphics::VertexFormats::sVertex_mesh, r)));
-			const auto errorCode = glGetError();
-			if (errorCode == GL_NO_ERROR)
-			{
-				glEnableVertexAttribArray(vertexElementLocation);
-				const GLenum errorCode = glGetError();
-				if (errorCode != GL_NO_ERROR)
-				{
-					result = eae6320::Results::Failure;
-					EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-					eae6320::Logging::OutputError("OpenGL failed to enable the COLOR vertex attribute at location %u: %s",
-						vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-					return result;
-				}
-			}
-			else
-			{
-				result = eae6320::Results::Failure;
-				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				eae6320::Logging::OutputError("OpenGL failed to set the COLOR vertex attribute at location %u: %s",
-					vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				return result;
-			}
-		}
-
-		//TEXTURE (2)
-		//2 float 8 bits == 4 bytes
-		//Offset = 24
-		{
-			constexpr GLuint vertexElementLocation = 2;
-			constexpr GLint elementCount = 2;
-			constexpr GLboolean notNormalized = GL_FALSE;	// The given floats should be used as-is
-			glVertexAttribPointer(vertexElementLocation, elementCount, GL_FLOAT, notNormalized, stride,
-				reinterpret_cast<GLvoid*>(offsetof(eae6320::Graphics::VertexFormats::sVertex_mesh, u)));
-			const auto errorCode = glGetError();
-			if (errorCode == GL_NO_ERROR)
-			{
-				glEnableVertexAttribArray(vertexElementLocation);
-				const GLenum errorCode = glGetError();
-				if (errorCode != GL_NO_ERROR)
-				{
-					result = eae6320::Results::Failure;
-					EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-					eae6320::Logging::OutputError("OpenGL failed to enable the TEXTURE vertex attribute at location %u: %s",
-						vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-					return result;
-				}
-			}
-			else
-			{
-				result = eae6320::Results::Failure;
-				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				eae6320::Logging::OutputError("OpenGL failed to set the TEXTURE vertex attribute at location %u: %s",
-					vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				return result;
-			}
-		}
-
 	}
+	return result;
+}
+
+eae6320::cResult eae6320::Graphics::cMesh::InitializeViews(const sInitializationParameters& i_initializationParameters)
+{
+	//This function is not supported for OpenGL so we will just return success
+	auto result = Results::Success;
 	return result;
 }
 

@@ -50,13 +50,6 @@ eae6320::cResult eae6320::Graphics::sContext::Initialize( const sInitializationP
 	return result;
 }
 
-eae6320::cResult eae6320::Graphics::sContext::InitializeViews(const sInitializationParameters& i_initializationParameters)
-{
-	//This function is not supported for OpenGL so we will just return success
-	auto result = Results::Success;
-	return result;
-}
-
 eae6320::cResult eae6320::Graphics::sContext::CleanUp()
 {
 	auto result = Results::Success;
