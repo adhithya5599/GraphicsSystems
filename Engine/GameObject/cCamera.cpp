@@ -11,7 +11,7 @@ eae6320::GameObject::cCamera::cCamera()
 	m_configurations = new eae6320::Math::cMatrix_transformation();
 	m_rigidBodyState->position = Math::sVector( 0.f, 0.f, 10.f );
 	*m_transform = Math::cMatrix_transformation::CreateWorldToCameraTransform(m_rigidBodyState->orientation, m_rigidBodyState->position);
-	*m_configurations = Math::cMatrix_transformation::CreateCameraToProjectedTransform_perspective(Math::ConvertDegreesToRadians(45.f), 1.f, 0.1f, 50.f);
+	*m_configurations = Math::cMatrix_transformation::CreateCameraToProjectedTransform_perspective(Math::ConvertDegreesToRadians(45.f), 1.f, 0.1f, 11.f);
 	m_rigidBodyState->position = m_transform->GetTranslation();
 }
 

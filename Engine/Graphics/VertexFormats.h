@@ -34,17 +34,13 @@ namespace eae6320
 			// In a real game it would be more common to have several different formats
 			// (with simpler/smaller formats for simpler shading
 			// and more complex and bigger formats for more complicated shading).
-#pragma pack(push, 1)
 			struct sVertex_mesh
 			{
 				// POSITION
 				// 3 floats == 12 bytes
 				// Offset = 0
 				float x, y, z;
-				uint8_t r = 255 , g = 255, b = 255, a = 255;
-				float u, v;
 			};
-#pragma pack(pop)
 		}
 	}
 }

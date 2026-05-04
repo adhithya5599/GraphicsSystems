@@ -71,13 +71,9 @@ eae6320::cResult eae6320::Graphics::cEffect::InitializeShadingData(const std::st
 		{
 			uint8_t renderStateBits = 0;
 			eae6320::Graphics::RenderStates::DisableAlphaTransparency(renderStateBits);
-			//eae6320::Graphics::RenderStates::EnableAlphaTransparency(renderStateBits);
-			eae6320::Graphics::RenderStates::EnableDepthTesting(renderStateBits);
-			eae6320::Graphics::RenderStates::EnableDepthWriting(renderStateBits);
-			//eae6320::Graphics::RenderStates::DisableDepthTesting(renderStateBits);
-			//eae6320::Graphics::RenderStates::DisableDepthWriting(renderStateBits);
-			//eae6320::Graphics::RenderStates::DisableDrawingBothTriangleSides(renderStateBits);
-			eae6320::Graphics::RenderStates::EnableDrawingBothTriangleSides(renderStateBits);
+			eae6320::Graphics::RenderStates::DisableDepthTesting(renderStateBits);
+			eae6320::Graphics::RenderStates::DisableDepthWriting(renderStateBits);
+			eae6320::Graphics::RenderStates::DisableDrawingBothTriangleSides(renderStateBits);
 
 			return renderStateBits;
 		}();
