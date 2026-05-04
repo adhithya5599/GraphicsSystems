@@ -22,24 +22,6 @@
 
 namespace eae6320
 {
-	namespace Math
-	{
-		class cMatrix_transformation;
-	}
-
-	namespace GameObject
-	{
-		class cCamera;
-	}
-
-	namespace Texture
-	{
-		class cTexture;
-	}
-}
-
-namespace eae6320
-{
 	namespace Graphics
 	{
 		// Submission
@@ -53,16 +35,12 @@ namespace eae6320
 		// of how the application submits the total elapsed times
 		// for the frame currently being submitted
 		void SubmitElapsedTime( const float i_elapsedSecondCount_systemTime, const float i_elapsedSecondCount_simulationTime );
-		//Submit the Camera data
-		// the values are the camera object, the vertical field of view, focal length, near plane and far plane
-		//void SubmitCameraDataForANewFrame(cCamera* i_camera, const float i_verticalFieldOfView, const float i_focalLength, const float i_nearPlaneDistance, const float i_farPlaneDistance);
-		void SubmitCameraDataForANewFrame(GameObject::cCamera* i_camera, eae6320::Math::cMatrix_transformation& i_transform);
 		//Submit the background color data for the new frame
 		//the values for red, green and blue should be between 0.0f to 1.0f
 		void SubmitBackgroundColorForANewFrame(const float i_redColorValue, const float i_greenColorValue, const float i_blueColorValue);
 		//Submit the coordinates of the triangle to be drawn and the order of it
         // and pass the effect to be attached to the same
-		void SubmitCoordinateWithOrderAndEffectForANewFrame(cMesh*& o_mesh, cEffect*& o_effect, Math::cMatrix_transformation& i_transform, Texture::cTexture*& o_texture, unsigned int i_textureSlot);
+		void SubmitCoordinateWithOrderAndEffectForANewFrame(cMesh*& o_mesh, cEffect*& o_effect);
 		// When the application is ready to submit data for a new frame
 		// it should call this before submitting anything
 		// (or, said another way, it is not safe to submit data for a new frame

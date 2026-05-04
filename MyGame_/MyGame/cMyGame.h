@@ -20,13 +20,13 @@
 
 namespace eae6320
 {
+
 	class cMyGame final : public Application::iApplication
 	{
 		// Inherited Implementation
 		//=========================
 		void SubmitDataToBeRendered(const float i_elapsedSecondCount_systemTime, const float i_elapsedSecondCount_sinceLastSimulationUpdate) final;
 		void UpdateSimulationBasedOnInput() final;
-		void UpdateSimulationBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate) final;
 	private:
 
 		// Configuration

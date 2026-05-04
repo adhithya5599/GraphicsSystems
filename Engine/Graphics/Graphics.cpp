@@ -9,31 +9,21 @@
 #include <Engine/Concurrency/cEvent.h>
 #include <Engine/Logging/Logging.h>
 #include <Engine/UserOutput/UserOutput.h>
-#include <Engine/Math/cMatrix_transformation.h>
-#include <Engine/GameObject/cCamera.h>
-#include <Engine/Math/Functions.h>
-#include <Engine/Texture/cTexture.h>
 
 namespace
 {	
 	// Constant buffer object Common
 	eae6320::Graphics::cConstantBuffer s_constantBuffer_frame(eae6320::Graphics::ConstantBufferTypes::Frame);
 
-	//Constant Buffer object Draw
-	eae6320::Graphics::cConstantBuffer s_constantBuffer_draw(eae6320::Graphics::ConstantBufferTypes::DrawCall);
-
 	struct DrawAndColorParameters
 	{
 		eae6320::Graphics::cEffect* effectData = nullptr;
 		eae6320::Graphics::cMesh* drawData = nullptr;
-		eae6320::Texture::cTexture* textureData = nullptr;
-		eae6320::Graphics::ConstantBufferFormats::sDrawCall drawData_frame;
-		unsigned int textureSlot = 0;
 	};
 
 	// This struct's data is populated at submission time;
 	// it must cache whatever is necessary in order to render a frame
-	constexpr unsigned int countDrawAndEffect = 200;
+	constexpr unsigned int countDrawAndEffect = 30;
 	struct sDataRequiredToRenderAFrame
 	{
 		eae6320::Graphics::ConstantBufferFormats::sFrame constantData_frame;
@@ -48,7 +38,6 @@ namespace
 	sDataRequiredToRenderAFrame s_dataRequiredToRenderAFrame[2];
 	auto* s_dataBeingSubmittedByApplicationThread = &s_dataRequiredToRenderAFrame[0];
 	auto* s_dataBeingRenderedByRenderThread = &s_dataRequiredToRenderAFrame[1];
-
 	// The following two events work together to make sure that
 	// the main/render thread and the application loop thread can work in parallel but stay in sync:
 	// This event is signaled by the application loop thread when it has finished submitting render data for a frame
@@ -60,7 +49,6 @@ namespace
 	// (the application loop thread waits for the signal)
 	eae6320::Concurrency::cEvent s_whenDataForANewFrameCanBeSubmittedFromApplicationThread;
 
-	//eae6320::GameObject::cCamera* camera = new eae6320::GameObject::cCamera();
 }
 
 //Submission
@@ -71,16 +59,7 @@ void eae6320::Graphics::SubmitElapsedTime(const float i_elapsedSecondCount_syste
 	EAE6320_ASSERT(s_dataBeingSubmittedByApplicationThread);
 	auto& constantData_frame = s_dataBeingSubmittedByApplicationThread->constantData_frame;
 	constantData_frame.g_elapsedSecondCount_systemTime = i_elapsedSecondCount_systemTime;
-	constantData_frame.g_elapsedSecondCount_simulationTime = i_elapsedSecondCount_simulationTime;	
-}
-
-void eae6320::Graphics::SubmitCameraDataForANewFrame(eae6320::GameObject::cCamera* i_camera, eae6320::Math::cMatrix_transformation& i_transform)
-{
-	EAE6320_ASSERT(s_dataBeingSubmittedByApplicationThread);
-	auto& constantData_frame = s_dataBeingSubmittedByApplicationThread->constantData_frame;
-	constantData_frame.g_transform_worldToCamera = i_transform;
-	constantData_frame.g_transform_cameraToProjected = i_camera->GetCameraConfigurations();
-
+	constantData_frame.g_elapsedSecondCount_simulationTime = i_elapsedSecondCount_simulationTime;
 }
 
 void eae6320::Graphics::SubmitBackgroundColorForANewFrame(const float i_redColorValue, const float i_greenColorValue, const float i_blueColorValue)
@@ -92,13 +71,13 @@ void eae6320::Graphics::SubmitBackgroundColorForANewFrame(const float i_redColor
 	backgroundColor_frame[2] = i_blueColorValue;
 }
 
-void eae6320::Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(eae6320::Graphics::cMesh*& o_mesh, eae6320::Graphics::cEffect*& o_effect, eae6320::Math::cMatrix_transformation& i_transform, eae6320::Texture::cTexture*& o_texture, unsigned int i_textureSlot)
+void eae6320::Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(eae6320::Graphics::cMesh*& o_mesh, eae6320::Graphics::cEffect*& o_effect)
 {
 	EAE6320_ASSERT(s_dataBeingSubmittedByApplicationThread);
 	
 	auto& countRenderFrame_frame = s_dataBeingSubmittedByApplicationThread->countRenderFrame;
 	
-	if (countRenderFrame_frame >= countDrawAndEffect)
+	if (countRenderFrame_frame > countDrawAndEffect)
 	{
 		EAE6320_ASSERTF(false, "Couldn't get the new graphics data");
 		Logging::OutputError("Exceeded mesh and effect memory allocated");
@@ -114,19 +93,6 @@ void eae6320::Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(eae6320::
 	auto& effect_data_frame = s_dataBeingSubmittedByApplicationThread->drawColorParameters[countRenderFrame_frame].effectData;
 	effect_data_frame = o_effect;
 	effect_data_frame->IncrementReferenceCount();
-
-	auto& drawData_frame = s_dataBeingSubmittedByApplicationThread->drawColorParameters[countRenderFrame_frame].drawData_frame;
-	drawData_frame.g_transform_localToWorld = i_transform;
-
-	auto& texture_data_frame = s_dataBeingSubmittedByApplicationThread->drawColorParameters[countRenderFrame_frame].textureData;
-	texture_data_frame = o_texture;
-	if (texture_data_frame)
-	{
-		texture_data_frame->IncrementReferenceCount();
-	}
-
-	auto& textureSlot_data_frame = s_dataBeingSubmittedByApplicationThread->drawColorParameters[countRenderFrame_frame].textureSlot;
-	textureSlot_data_frame = i_textureSlot;
 
 	++countRenderFrame_frame;
 }
@@ -206,34 +172,19 @@ void eae6320::Graphics::RenderFrame()
 		auto& constantData_frame = s_dataBeingRenderedByRenderThread->constantData_frame;
 		s_constantBuffer_frame.Update(&constantData_frame);
 	}
-
 	auto& countRenderFrame_frame = s_dataBeingRenderedByRenderThread->countRenderFrame;
 	for (unsigned int i = 0; i < countRenderFrame_frame; i++)
 	{
 		auto& mesh_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].drawData;
 		auto& effect_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].effectData;
-		auto& texture_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].textureData;
-		auto& textureSlot_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].textureSlot;
-
-		//Update the draw constant buffer
-		{
-			auto& drawData_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].drawData_frame;
-			s_constantBuffer_draw.Update(&drawData_frame);
-		}
-
 		// Bind the shading data
 		{
+			//s_dataBeingRenderedByRenderThread->effect_data->Bind();
 			effect_data_frame->Bind();
-		}
-		//Bind the texture data
-		{
-			if (texture_data_frame)
-			{
-				texture_data_frame->Bind(textureSlot_data_frame);
-			}
 		}
 		// Draw the geometry
 		{
+			//s_dataBeingRenderedByRenderThread->mesh_data->Draw();
 			mesh_data_frame->Draw();
 		}
 
@@ -247,13 +198,18 @@ void eae6320::Graphics::RenderFrame()
 			effect_data_frame->DecrementReferenceCount();
 			effect_data_frame = nullptr;
 		}
-		if (texture_data_frame)
-		{
-			texture_data_frame->DecrementReferenceCount();
-			texture_data_frame = nullptr;
-		}
+		//s_dataBeingRenderedByRenderThread->drawColorParameters[i].drawData->DecrementReferenceCount();
+		//s_dataBeingRenderedByRenderThread->drawColorParameters[i].effectData->DecrementReferenceCount();
 	}
 	countRenderFrame_frame = 0;
+	//// Bind the shading data
+	//{
+	//	effect_data[1]->Bind();
+	//}
+	//// Draw the geometry
+	//{
+	//	mesh_data[1]->Draw();
+	//}
 
 	// Everything has been drawn to the "back buffer", which is just an image in memory.
 	// In order to display it the contents of the back buffer must be "presented"
@@ -298,17 +254,6 @@ eae6320::cResult eae6320::Graphics::Initialize(const sInitializationParameters& 
 			EAE6320_ASSERTF(false, "Can't initialize Graphics without frame constant buffer");
 			return result;
 		}
-
-		if (result = s_constantBuffer_draw.Initialize())
-		{
-			s_constantBuffer_draw.Bind(
-				static_cast<uint_fast8_t>(eShaderType::Vertex) | static_cast<uint_fast8_t>(eShaderType::Fragment));
-		}
-		else
-		{
-			EAE6320_ASSERTF(false, "Can't initialize Graphics without draw constant buffer");
-			return result;
-		}
 	}
 	// Initialize the events
 	{
@@ -345,7 +290,6 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 		{
 			auto& mesh_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].drawData;
 			auto& effect_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].effectData;
-			auto& texture_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].textureData;
 			if (mesh_data_frame)
 			{
 				mesh_data_frame->DecrementReferenceCount();
@@ -355,11 +299,6 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 			{
 				effect_data_frame->DecrementReferenceCount();
 				effect_data_frame = nullptr;
-			}
-			if (texture_data_frame)
-			{
-				texture_data_frame->DecrementReferenceCount();
-				texture_data_frame = nullptr;
 			}
 		}
 	}
@@ -369,7 +308,6 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 		{
 			auto& mesh_data_frame = s_dataBeingSubmittedByApplicationThread->drawColorParameters[i].drawData;
 			auto& effect_data_frame = s_dataBeingSubmittedByApplicationThread->drawColorParameters[i].effectData;
-			auto& texture_data_frame = s_dataBeingSubmittedByApplicationThread->drawColorParameters[i].textureData;
 			if (mesh_data_frame)
 			{
 				mesh_data_frame->DecrementReferenceCount();
@@ -379,11 +317,6 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 			{
 				effect_data_frame->DecrementReferenceCount();
 				effect_data_frame = nullptr;
-			}
-			if (texture_data_frame)
-			{
-				texture_data_frame->DecrementReferenceCount();
-				texture_data_frame = nullptr;
 			}
 		}
 	}
@@ -396,20 +329,6 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 			if ( result )
 			{
 				result = result_constantBuffer_frame;
-			}
-		}
-	}
-
-	{
-		const auto result_constantBuffer_draw = s_constantBuffer_draw.CleanUp();
-		if (!result_constantBuffer_draw)
-		{
-			EAE6320_ASSERT(false);
-			{
-				if (result)
-				{
-					result = result_constantBuffer_draw;
-				}
 			}
 		}
 	}

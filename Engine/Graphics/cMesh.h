@@ -9,8 +9,6 @@
 
 #include <Engine/Results/Results.h>
 #include <Engine/Assets/ReferenceCountedAssets.h>
-#include <string>
-#include <cstdint>
 
 #ifdef EAE6320_PLATFORM_GL
 #include "OpenGL/Includes.h"
@@ -28,7 +26,7 @@ namespace eae6320
 		{
 			public:
 				//Factory function to initialize the mesh object
-				static cResult Load(cMesh*& o_mesh, const std::string& i_vertexMeshPath);
+				static cResult Load(cMesh*& o_mesh, const unsigned int i_indexCount, VertexFormats::sVertex_mesh i_vertexData[], const unsigned int i_vertexCount, uint16_t i_indexData[]);
 
 				void Draw();
 
