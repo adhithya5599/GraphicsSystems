@@ -42,21 +42,6 @@
     <ClCompile Include="OpenGL\sContext.gl.cpp">
       <Filter>OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="Direct3D\cMesh.d3d.cpp">
-      <Filter>Direct3D</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\cMesh.gl.cpp">
-      <Filter>OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="cEffect.cpp" />
-    <ClCompile Include="OpenGL\cEffect.gl.cpp">
-      <Filter>OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="Direct3D\cEffect.d3d.cpp">
-      <Filter>Direct3D</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics.cpp" />
-    <ClCompile Include="cMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cConstantBuffer.h" />
@@ -77,8 +62,6 @@
     <ClInclude Include="Windows\ExternalLibraries.win.h">
       <Filter>Windows</Filter>
     </ClInclude>
-    <ClInclude Include="cMesh.h" />
-    <ClInclude Include="cEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cRenderState.inl" />

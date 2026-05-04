@@ -10,15 +10,25 @@
 
 #include <Shaders/shaders.inc>
 
+#if defined( EAE6320_PLATFORM_D3D )
+
 // Constant Buffers
 //=================
 
-DeclareConstantBuffer(g_constantBuffer_drawCall, 2)
+cbuffer g_constantBuffer_frame : register( b0 )
 {
-	float4x4 g_transform_localToWorld;
+	float4x4 g_transform_worldToCamera;
+	float4x4 g_transform_cameraToProjected;
+
+	float g_elapsedSecondCount_systemTime;
+	float g_elapsedSecondCount_simulationTime;
+	// For float4 alignment
+	float2 g_padding;
 };
 
-#if defined( EAE6320_PLATFORM_D3D )
+// Entry Point
+//============
+
 void main(
 
 	// Input
@@ -29,26 +39,15 @@ void main(
 
 	// These values come from one of the VertexFormats::sVertex_mesh that the vertex buffer was filled with in C code
 	in const float3 i_vertexPosition_local : POSITION,
-	in const float4 i_vertexColor_local : COLOR,
-	in const float2 i_texcoord_local : TEXCOORD,
+
 	// Output
 	//=======
 
 	// An SV_POSITION value must always be output from every vertex shader
 	// so that the GPU can figure out which fragments need to be shaded
-	out float4 o_vertexPosition_projected : SV_POSITION,
-	out float4 o_vertexColor_projected : COLOR,
-	out float2 o_texcoord_projected : TEXCOORD
+	out float4 o_vertexPosition_projected : SV_POSITION
 
 )
-#elif defined( EAE6320_PLATFORM_GL )
-layout( location = 0 ) in vec3 i_vertexPosition_local;
-layout( location = 1 ) in vec4 i_vertexColor_local;
-layout( location = 1 ) out vec4 o_vertexColor_projected;
-layout( location = 2 ) in vec2 i_texcoord_local;
-layout( location = 2 ) out vec2 o_texcoord_projected;
-void main()
-#endif
 {
 	// Transform the local vertex into world space
 	float4 vertexPosition_world;
@@ -56,21 +55,69 @@ void main()
 		// This will be done in a future assignment.
 		// For now, however, local space is treated as if it is the same as world space.
 		float4 vertexPosition_local = float4( i_vertexPosition_local, 1.0 );
-		vertexPosition_world = TransfromVector(g_transform_localToWorld, vertexPosition_local);
+		vertexPosition_world = vertexPosition_local;
 	}
 	// Calculate the position of this vertex projected onto the display
 	{
 		// Transform the vertex from world space into camera space
-		float4 vertexPosition_camera = TransfromVector( g_transform_worldToCamera, vertexPosition_world );
+		float4 vertexPosition_camera = mul( g_transform_worldToCamera, vertexPosition_world );
 		// Project the vertex from camera space into projected space
-		o_vertexPosition_projected = TransfromVector( g_transform_cameraToProjected, vertexPosition_camera );
-	}
-	//Assign input color to the output color
-	{
-		o_vertexColor_projected = float4(i_vertexColor_local);
-	}
-	//Assign the texture
-	{
-		o_texcoord_projected = float2(i_texcoord_local);
+		o_vertexPosition_projected = mul( g_transform_cameraToProjected, vertexPosition_camera );
 	}
 }
+
+#elif defined( EAE6320_PLATFORM_GL )
+
+// Constant Buffers
+//=================
+
+layout( std140, binding = 0 ) uniform g_constantBuffer_frame
+{
+	mat4 g_transform_worldToCamera;
+	mat4 g_transform_cameraToProjected;
+
+	float g_elapsedSecondCount_systemTime;
+	float g_elapsedSecondCount_simulationTime;
+	// For vec4 alignment
+	vec2 g_padding;
+};
+
+// Input
+//======
+
+// The locations assigned are arbitrary
+// but must match the C calls to glVertexAttribPointer()
+
+// These values come from one of the VertexFormats::sVertex_mesh that the vertex buffer was filled with in C code
+layout( location = 0 ) in vec3 i_vertexPosition_local;
+
+// Output
+//=======
+
+// The vertex shader must always output a position value,
+// but unlike HLSL where the value is explicit
+// GLSL has an automatically-required variable named "gl_Position"
+
+// Entry Point
+//============
+
+void main()
+{
+	// Transform the local vertex into world space
+	vec4 vertexPosition_world;
+	{
+		// This will be done in a future assignment.
+		// For now, however, local space is treated as if it is the same as world space.
+		vec4 vertexPosition_local = vec4( i_vertexPosition_local, 1.0 );
+		vertexPosition_world = vertexPosition_local;
+	}
+	// Calculate the position of this vertex projected onto the display
+	{
+		// Transform the vertex from world space into camera space
+		vec4 vertexPosition_camera = g_transform_worldToCamera * vertexPosition_world;
+		// Project the vertex from camera space into projected space
+		gl_Position = g_transform_cameraToProjected * vertexPosition_camera;
+	}
+}
+
+#endif

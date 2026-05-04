@@ -50,13 +50,6 @@ eae6320::cResult eae6320::Graphics::sContext::Initialize( const sInitializationP
 	return result;
 }
 
-eae6320::cResult eae6320::Graphics::sContext::InitializeViews(const sInitializationParameters& i_initializationParameters)
-{
-	//This function is not supported for OpenGL so we will just return success
-	auto result = Results::Success;
-	return result;
-}
-
 eae6320::cResult eae6320::Graphics::sContext::CleanUp()
 {
 	auto result = Results::Success;
@@ -99,33 +92,6 @@ eae6320::cResult eae6320::Graphics::sContext::CleanUp()
 	windowBeingRenderedTo = NULL;
 
 	return result;
-}
-
-void eae6320::Graphics::sContext::ClearImageBuffer(const float i_backGroundColor[])
-{
-	glClearColor(i_backGroundColor[0], i_backGroundColor[1], i_backGroundColor[2], 1.0f);
-	EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
-	{
-		constexpr GLbitfield clearColor = GL_COLOR_BUFFER_BIT;
-		glClear(clearColor);
-		EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
-	}
-}
-
-void eae6320::Graphics::sContext::ClearDepthBuffer()
-{
-	{
-		glDepthMask(GL_TRUE);
-		EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
-		constexpr GLclampd clearToFarDepth = 1.0;
-		glClearDepth(clearToFarDepth);
-		EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
-	}
-	{
-		constexpr GLbitfield clearDepth = GL_DEPTH_BUFFER_BIT;
-		glClear(clearDepth);
-		EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
-	}
 }
 
 // Helper Declarations

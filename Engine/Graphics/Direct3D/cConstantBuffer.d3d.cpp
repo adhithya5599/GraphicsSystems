@@ -83,16 +83,6 @@ void eae6320::Graphics::cConstantBuffer::Update( const void* const i_data )
 	memcpy( memoryToWriteTo, i_data, m_size );
 }
 
-void eae6320::Graphics::cConstantBuffer::SwapBuffer()
-{
-	auto* const swapChain = sContext::g_context.swapChain;
-	EAE6320_ASSERT(swapChain);
-	constexpr unsigned int swapImmediately = 0;
-	constexpr unsigned int presentNextFrame = 0;
-	const auto result = swapChain->Present(swapImmediately, presentNextFrame);
-	EAE6320_ASSERT(SUCCEEDED(result));
-}
-
 // Initialize / Clean Up
 //----------------------
 

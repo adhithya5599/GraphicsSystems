@@ -51,7 +51,7 @@ eae6320::cResult eae6320::Graphics::cVertexFormat::Initialize( const eVertexType
 		{
 		case eVertexType::Mesh:
 			{
-				constexpr unsigned int vertexElementCount = 3;
+				constexpr unsigned int vertexElementCount = 1;
 				D3D11_INPUT_ELEMENT_DESC layoutDescription[vertexElementCount] = {};
 				{
 					// Slot 0
@@ -70,35 +70,6 @@ eae6320::cResult eae6320::Graphics::cVertexFormat::Initialize( const eVertexType
 						positionElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 						positionElement.InstanceDataStepRate = 0;	// (Must be zero for per-vertex data)
 					}
-					
-					// Slot 1
-					//COLOR
-					// Offset = 12
-					{
-						auto& colorElement = layoutDescription[1];
-						colorElement.SemanticName = "COLOR";
-						colorElement.SemanticIndex = 0;
-						colorElement.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-						colorElement.InputSlot = 0;
-						colorElement.AlignedByteOffset = offsetof( VertexFormats::sVertex_mesh, r );
-						colorElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-						colorElement.InstanceDataStepRate = 0;
-					}
-
-					//Slot 2
-					//Texture
-					// Offset = 24
-					{
-						auto& texCoordElement = layoutDescription[2];
-						texCoordElement.SemanticName = "TEXCOORD";
-						texCoordElement.SemanticIndex = 0;
-						texCoordElement.Format = DXGI_FORMAT_R32G32_FLOAT;
-						texCoordElement.InputSlot = 0;
-						texCoordElement.AlignedByteOffset = offsetof( VertexFormats::sVertex_mesh, u );
-						texCoordElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-						texCoordElement.InstanceDataStepRate = 0;
-					}
-
 				}
 
 				const auto d3dResult = direct3dDevice->CreateInputLayout( layoutDescription, vertexElementCount,
