@@ -15,13 +15,13 @@
 
 eae6320::cResult eae6320::Assets::cMeshBuilder::Build(const std::vector<std::string>& i_arguments)
 {
-    auto result = Results::Success;
+	auto result = Results::Success;
 
     uint16_t* indexData = nullptr;
     eae6320::Graphics::VertexFormats::sVertex_mesh* vertexData = nullptr;
     uint16_t vertexCount;
     uint16_t indexCount;
-
+    
     {
         if (!(result = LoadAsset(m_path_source, indexData, vertexData, vertexCount, indexCount)))
         {
@@ -41,7 +41,7 @@ eae6320::cResult eae6320::Assets::cMeshBuilder::Build(const std::vector<std::str
         fout.close();
     }
 
-    return result;
+	return result;
 }
 
 eae6320::cResult eae6320::Assets::cMeshBuilder::LoadAsset(const char* const i_path, uint16_t*& i_index, eae6320::Graphics::VertexFormats::sVertex_mesh*& i_vertex, uint16_t& i_vertexCount, uint16_t& i_indexCount)
@@ -245,7 +245,6 @@ eae6320::cResult eae6320::Assets::cMeshBuilder::LoadVertexValues(lua_State& io_l
     auto result = eae6320::Results::Success;
     float x = 0.0, y = 0.0, z = 0.0;
     uint8_t r = 0, g = 0, b = 0, a = 0;
-    float u = 0.0f, v = 0.0f;
     i_vertex = new eae6320::Graphics::VertexFormats::sVertex_mesh[i_vertexCount];
     if (i_vertexCount > 0)
     {
@@ -266,9 +265,6 @@ eae6320::cResult eae6320::Assets::cMeshBuilder::LoadVertexValues(lua_State& io_l
             constexpr auto* const keyG = "g";
             constexpr auto* const keyB = "b";
             constexpr auto* const keyA = "a";
-
-            constexpr auto* const keyU = "u";
-            constexpr auto* const keyV = "v";
 
             lua_pushstring(&io_luaState, keyX);
             {
@@ -413,47 +409,7 @@ eae6320::cResult eae6320::Assets::cMeshBuilder::LoadVertexValues(lua_State& io_l
                 a = static_cast<uint8_t>(value);
             }
 
-            lua_pushstring(&io_luaState, keyU);
-            {
-                constexpr int currentIndexOfTable = -9;
-                lua_gettable(&io_luaState, currentIndexOfTable);
-            }
-            eae6320::cScopeGuard scopeGuard_popU([&io_luaState]
-                {
-                    lua_pop(&io_luaState, 1);
-                });
-            if (lua_isnil(&io_luaState, -1))
-            {
-                result = eae6320::Results::InvalidFile;
-                OutputErrorMessageWithFileInfo(m_path_source, "No value was found %s for in asset table", keyU);
-                return result;
-            }
-            {
-                const auto value = lua_tonumber(&io_luaState, -1);
-                u = static_cast<float>(value);
-            }
-
-            lua_pushstring(&io_luaState, keyV);
-            {
-                constexpr int currentIndexOfTable = -10;
-                lua_gettable(&io_luaState, currentIndexOfTable);
-            }
-            eae6320::cScopeGuard scopeGuard_popV([&io_luaState]
-                {
-                    lua_pop(&io_luaState, 1);
-                });
-            if (lua_isnil(&io_luaState, -1))
-            {
-                result = eae6320::Results::InvalidFile;
-                OutputErrorMessageWithFileInfo(m_path_source, "No value was found %s for in asset table", keyV);
-                return result;
-            }
-            {
-                const auto value = lua_tonumber(&io_luaState, -1);
-                v = static_cast<float>(value);
-            }
-
-            i_vertex[i - 1] = { x, y, z, r, g, b, a, u, v };
+            i_vertex[i - 1] = { x, y, z, r, g, b, a };
         }
     }
     else

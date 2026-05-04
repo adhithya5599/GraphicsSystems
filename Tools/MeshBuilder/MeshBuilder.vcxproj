@@ -35,6 +35,9 @@
     <ProjectReference Include="..\..\Engine\ScopeGuard\ScopeGuard.vcxproj">
       <Project>{b7ed3f7d-bfa1-42c9-9089-c6401ffde3d4}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Engine\Time\Time.vcxproj">
+      <Project>{674d3e72-cbd0-4ebd-bd0c-cf9326489421}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Engine\Windows\Windows.vcxproj">
       <Project>{6ff846d1-2377-4601-b2f6-83e31748cb16}</Project>
     </ProjectReference>

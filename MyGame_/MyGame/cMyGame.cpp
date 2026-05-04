@@ -12,7 +12,6 @@
 #include <Engine/Math/cMatrix_transformation.h>
 #include <Engine/Physics/sRigidBodyState.h>
 #include <Engine/GameObject/cCamera.h>
-#include <Engine/Texture/cTexture.h>
 
 // Inherited Implementation
 //=========================
@@ -31,22 +30,10 @@ std::string vertexColorFilePath = "data/Shaders/Fragment/myShader.shader";
 
 const std::string planeMayaMesh = "data/Meshes/plane.mayamesh";
 const std::string cylinderMayaMesh = "data/Meshes/cylinder.mayamesh";
-const std::string primsMayaMesh = "data/Meshes/prism.mayamesh";
-
-const std::string textureFilePath = "data/Textures/groundTexture.bmp";
-const std::string defaultTexturePath = "data/Textures/whiteTexture.bmp";
-const std::string grassTexturePath = "data/Textures/grassTexture.bmp";
-const std::string waterTexturePath = "data/Textures/waterTexture.bmp";
-const std::string lensTexturePath = "data/Textures/lensTexture.bmp";
+const std::string primsMayaMesh = "data/Meshes/testColor.mayamesh";
 
 eae6320::Graphics::cMesh* drawData[] = { nullptr, nullptr, nullptr };
 eae6320::Graphics::cEffect* effectData[] = { nullptr, nullptr, nullptr };
-
-eae6320::Texture::cTexture* groundTexture = nullptr;
-eae6320::Texture::cTexture* noTexture = nullptr;
-eae6320::Texture::cTexture* waterTexture = nullptr;
-eae6320::Texture::cTexture* grassTexture = nullptr;
-eae6320::Texture::cTexture* lensTexture = nullptr;
 
 eae6320::GameObject::cMyGameObject* playerObject = new eae6320::GameObject::cMyGameObject(drawData[0], effectData[0]);
 eae6320::GameObject::cMyGameObject* planeObject = new eae6320::GameObject::cMyGameObject(drawData[1], effectData[1]);
@@ -69,21 +56,13 @@ void eae6320::cMyGame::SubmitDataToBeRendered(const float i_elapsedSecondCount_s
 
 	if (bIsBackspacePressed)
 	{
-		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(playerObject->GetMesh(),
-			planeObject->GetEffect(), predictedTransform, waterTexture, 0);
-		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(planeObject->GetMesh(),
-			planeObject->GetEffect(), planeTransform, grassTexture, 0);
-		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(anotherObject->GetMesh(),
-			planeObject->GetEffect(), anotherTransform, lensTexture, 0);
+		//Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(anotherPlayerObject->GetMesh(), anotherPlayerObject->GetEffect(), predictedTransform);
 	}
 	else
 	{
-		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(playerObject->GetMesh(), 
-			playerObject->GetEffect(), predictedTransform, noTexture, 0);
-		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(planeObject->GetMesh(), 
-			planeObject->GetEffect(), planeTransform, groundTexture, 0);
-		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(anotherObject->GetMesh(), 
-			anotherObject->GetEffect(), anotherTransform, noTexture, 0);
+		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(playerObject->GetMesh(), playerObject->GetEffect(), predictedTransform);
+		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(planeObject->GetMesh(), planeObject->GetEffect(), planeTransform);
+		Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(anotherObject->GetMesh(), anotherObject->GetEffect(), anotherTransform);
 	}
 }
 
@@ -159,7 +138,7 @@ eae6320::cResult eae6320::cMyGame::Initialize()
 		return result;
 	}
 
-	vertexColorFilePath = "data/Shaders/Fragment/standard.shader";
+	vertexColorFilePath = "data/Shaders/Fragment/myAnotherShader.shader";
 	if (!(result = Graphics::cEffect::Load(planeObject->GetEffect(), pixelColorFilePath, vertexColorFilePath)))
 	{
 		EAE6320_ASSERTF(false, "Can't initialize Graphics without the shading data");
@@ -180,32 +159,6 @@ eae6320::cResult eae6320::cMyGame::Initialize()
 	if (!(result = Graphics::cMesh::Load(anotherObject->GetMesh(), primsMayaMesh)))
 	{
 		EAE6320_ASSERTF(false, "Can't initialize Graphics without the geometry data");
-		return result;
-	}
-
-	if (!(result = Texture::cTexture::Load(groundTexture, textureFilePath)))
-	{
-		EAE6320_ASSERTF(false, "Can't initialize Graphics without the texture data");
-		return result;
-	}
-	if (!(result = Texture::cTexture::Load(grassTexture, grassTexturePath)))
-	{
-		EAE6320_ASSERTF(false, "Can't initialize Graphics without the texture data");
-		return result;
-	}
-	if (!(result = Texture::cTexture::Load(lensTexture, lensTexturePath)))
-	{
-		EAE6320_ASSERTF(false, "Can't initialize Graphics without the texture data");
-		return result;
-	}
-	if (!(result = Texture::cTexture::Load(noTexture, defaultTexturePath)))
-	{
-		EAE6320_ASSERTF(false, "Can't initialize Graphics without the texture data");
-		return result;
-	}
-	if (!(result = Texture::cTexture::Load(waterTexture, waterTexturePath)))
-	{
-		EAE6320_ASSERTF(false, "Can't initialize Graphics without the texture data");
 		return result;
 	}
 

@@ -31,11 +31,6 @@ namespace eae6320
 	{
 		class cCamera;
 	}
-
-	namespace Texture
-	{
-		class cTexture;
-	}
 }
 
 namespace eae6320
@@ -62,7 +57,7 @@ namespace eae6320
 		void SubmitBackgroundColorForANewFrame(const float i_redColorValue, const float i_greenColorValue, const float i_blueColorValue);
 		//Submit the coordinates of the triangle to be drawn and the order of it
         // and pass the effect to be attached to the same
-		void SubmitCoordinateWithOrderAndEffectForANewFrame(cMesh*& o_mesh, cEffect*& o_effect, Math::cMatrix_transformation& i_transform, Texture::cTexture*& o_texture, unsigned int i_textureSlot);
+		void SubmitCoordinateWithOrderAndEffectForANewFrame(cMesh*& o_mesh, cEffect*& o_effect, Math::cMatrix_transformation& i_transform);
 		// When the application is ready to submit data for a new frame
 		// it should call this before submitting anything
 		// (or, said another way, it is not safe to submit data for a new frame

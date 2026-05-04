@@ -2,7 +2,9 @@
 #include <Engine/Asserts/Asserts.h>
 #include <Engine/ScopeGuard/cScopeGuard.h>
 #include <Engine/Logging/Logging.h>
+#include <External/Lua/Includes.h>
 #include <Engine/Platform/Platform.h>
+#include <Engine/Time/Time.h>
 
 eae6320::cResult eae6320::Graphics::cMesh::Load(cMesh*& o_mesh, const std::string& i_vertexMeshPath)
 {
@@ -14,8 +16,13 @@ eae6320::cResult eae6320::Graphics::cMesh::Load(cMesh*& o_mesh, const std::strin
     Platform::sDataFromFile dataFromFile;
     auto result = Results::Success;
 
+    Time::Initialize();
+    uint64_t startTime;
+    uint64_t endTime;
+
     {
         std::string errorMessage;
+        startTime = Time::GetCurrentSystemTimeTickCount();
         if (!(result = Platform::LoadBinaryFile(i_vertexMeshPath.c_str(), dataFromFile, &errorMessage)))
         {
             EAE6320_ASSERTF(false, "Couldn't load the mesh data from the binary file");
@@ -30,21 +37,23 @@ eae6320::cResult eae6320::Graphics::cMesh::Load(cMesh*& o_mesh, const std::strin
     {
         memcpy(&vertexCount, reinterpret_cast<void*>(currentOffset), sizeof(vertexCount));
     }
-
+    
     {
         currentOffset += sizeof(vertexCount);
         memcpy(&indexCount, reinterpret_cast<void*>(currentOffset), sizeof(indexCount));
     }
 
     {
-        currentOffset += sizeof(indexCount);
-        vertexData = reinterpret_cast<eae6320::Graphics::VertexFormats::sVertex_mesh*>(currentOffset);
+		currentOffset += sizeof(indexCount);
+		vertexData = reinterpret_cast<eae6320::Graphics::VertexFormats::sVertex_mesh*>(currentOffset);
     }
 
     {
-        currentOffset += sizeof(eae6320::Graphics::VertexFormats::sVertex_mesh) * vertexCount;
-        indexData = reinterpret_cast<uint16_t*>(currentOffset);
+		currentOffset += sizeof(eae6320::Graphics::VertexFormats::sVertex_mesh) * vertexCount;
+		indexData = reinterpret_cast<uint16_t*>(currentOffset);
     }
+    endTime = Time::GetCurrentSystemTimeTickCount();
+    Logging::OutputMessage("The time taken for the %s is %f", i_vertexMeshPath.c_str(), static_cast<float>(Time::ConvertTicksToSeconds(endTime - startTime)));
     cMesh* newMesh = nullptr;
     cScopeGuard scopeGuard([&o_mesh, &result, &newMesh]
         {
@@ -82,6 +91,16 @@ eae6320::cResult eae6320::Graphics::cMesh::Load(cMesh*& o_mesh, const std::strin
         EAE6320_ASSERTF(false, "Can't initialize Graphics without the geometry data");
         return result;
     }
+    
+    //if (vertexData)
+    //{
+    //    delete[] vertexData;
+    //}
+
+    //if (indexData)
+    //{
+    //    delete[] indexData;
+    //}
     return result;
 }
 

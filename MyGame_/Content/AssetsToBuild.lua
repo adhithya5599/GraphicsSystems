@@ -16,18 +16,11 @@ return
 
 	meshes = 
 	{
+		--{ path = "Meshes/geometry.lua" },
+		--{ path = "Meshes/geometryAnother.lua" },
 		{ path = "Meshes/plane.mayamesh" },
 		{ path = "Meshes/cylinder.mayamesh" },
 		{ path = "Meshes/prism.mayamesh" },
 		{ path = "Meshes/testColor.mayamesh" },
-	},
-
-	textures =
-	{
-		{ path = "Textures/groundTexture.bmp"},
-		{ path = "Textures/whiteTexture.bmp" },
-		{ path = "Textures/waterTexture.bmp" },
-		{ path = "Textures/lensTexture.bmp" },
-		{ path = "Textures/grassTexture.bmp" },
 	}
 }
