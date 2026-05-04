@@ -28,7 +28,7 @@
 
 namespace
 {
-	// Constant buffer object Common
+	// Constant buffer object
 	eae6320::Graphics::cConstantBuffer s_constantBuffer_frame( eae6320::Graphics::ConstantBufferTypes::Frame );
 
 	// Submission Data
@@ -277,10 +277,12 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 {
 	auto result = Results::Success;
 
-	if (!( result = mesh_data.CleanUp() ) )
 	{
-		EAE6320_ASSERTF(false, "Couldn't clean up vertex buffer id or vertex array id");
-		return result;
+		if (!( result = mesh_data.CleanUp() ) )
+		{
+			EAE6320_ASSERTF(false, "Couldn't clean up vertex buffer id or vertex array id");
+			return result;
+		}
 	}
 	if (!( result = effect_data.CleanUp() ) )
 	{

@@ -340,7 +340,7 @@ namespace
 		ID3D11Texture2D* backBuffer = nullptr;
 		ID3D11Texture2D* depthBuffer = nullptr;
 		eae6320::cScopeGuard scopeGuard( [&backBuffer, &depthBuffer]
-		{
+			{
 				// Regardless of success or failure the two texture resources should be released
 				// (if the function is successful the views will hold internal references to the resources)
 				if ( backBuffer )
@@ -353,7 +353,7 @@ namespace
 					depthBuffer->Release();
 					depthBuffer= nullptr;
 				}
-		} );
+			} );
 
 		auto& g_context = eae6320::Graphics::sContext::g_context;
 		auto* const direct3dDevice = g_context.direct3dDevice;

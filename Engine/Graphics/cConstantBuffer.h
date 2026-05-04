@@ -36,7 +36,6 @@
 
 #ifdef EAE6320_PLATFORM_D3D
 	struct ID3D11Buffer;
-	struct ID3D11RenderTargetView;
 #endif
 
 // Constant Buffer Types
@@ -103,9 +102,6 @@ namespace eae6320
 			// The specified data must be the appropriate Graphics::ConstantBufferFormats struct corresponding to this constant buffer's type!
 			// This function only needs to be called when the constant data that the GPU is using needs to change.
 			void Update( const void* const i_data );
-			
-			//Swaps the front buffer with the back buffer of where the image is drawn in memory
-			void SwapBuffer();
 
 			// Initialize / Clean Up
 			//----------------------

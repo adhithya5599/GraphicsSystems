@@ -2,7 +2,6 @@
 //=========
 
 #include "../cConstantBuffer.h"
-#include "../sContext.h"
 
 #include <Engine/Asserts/Asserts.h>
 #include <Engine/Logging/Logging.h>
@@ -41,14 +40,6 @@ void eae6320::Graphics::cConstantBuffer::Update( const void* const i_data )
 	}
 }
 
-void eae6320::Graphics::cConstantBuffer::SwapBuffer()
-{
-	const auto deviceContext = sContext::g_context.deviceContext;
-	EAE6320_ASSERT(deviceContext != NULL);
-	const auto glResult = SwapBuffers(deviceContext);
-	EAE6320_ASSERT(glResult != FALSE);
-}
-
 // Initialize / Clean Up
 //----------------------
 
@@ -73,6 +64,12 @@ eae6320::cResult eae6320::Graphics::cConstantBuffer::CleanUp()
 
 	return result;
 }
+
+// Implementation
+//===============
+
+// Initialize / Clean Up
+//----------------------
 
 eae6320::cResult eae6320::Graphics::cConstantBuffer::Initialize_platformSpecific( const void* const i_initialData )
 {

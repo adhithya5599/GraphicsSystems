@@ -4,13 +4,12 @@
 #include <Engine/Logging/Logging.h>
 
 
-eae6320::cResult eae6320::Graphics::cEffect::Initialize_platformSpecific()
+void eae6320::Graphics::cEffect::Initialize_platformSpecific(cResult& o_result)
 {
-	auto result = Results::Success;
 	// Create a program
-	eae6320::cScopeGuard scopeGuard_program([result, this]
+	eae6320::cScopeGuard scopeGuard_program([&]
 	{
-		if (! result )
+		if (!o_result)
 		{
 			if ( m_programId != 0 )
 			{
@@ -33,18 +32,18 @@ eae6320::cResult eae6320::Graphics::cEffect::Initialize_platformSpecific()
 		const auto errorCode = glGetError();
 		if ( errorCode != GL_NO_ERROR )
 		{
-			result = eae6320::Results::Failure;
+			o_result = eae6320::Results::Failure;
 			EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 			eae6320::Logging::OutputError("OpenGL failed to create a program: %s",
 				reinterpret_cast<const char*>(gluErrorString(errorCode)));
-			return result;
+			return;
 		}
 		else if ( m_programId == 0 )
 		{
-			result = eae6320::Results::Failure;
+			o_result = eae6320::Results::Failure;
 			EAE6320_ASSERT(false);
 			eae6320::Logging::OutputError("OpenGL failed to create a program");
-			return result;
+			return;
 		}
 	}
 	// Attach the shaders to the program
@@ -56,11 +55,11 @@ eae6320::cResult eae6320::Graphics::cEffect::Initialize_platformSpecific()
 			const auto errorCode = glGetError();
 			if ( errorCode != GL_NO_ERROR )
 			{
-				result = eae6320::Results::Failure;
+				o_result = eae6320::Results::Failure;
 				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 				eae6320::Logging::OutputError("OpenGL failed to attach the vertex shader to the program: %s",
 					reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				return result;
+				return;
 			}
 		}
 		//Fragment
@@ -70,11 +69,11 @@ eae6320::cResult eae6320::Graphics::cEffect::Initialize_platformSpecific()
 			const auto errorCode = glGetError();
 			if ( errorCode != GL_NO_ERROR )
 			{
-				result = eae6320::Results::Failure;
+				o_result = eae6320::Results::Failure;
 				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 				eae6320::Logging::OutputError("OpenGL failed to attach the fragment shader to the program: %s",
 					reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				return result;
+				return;
 			}
 		}
 	}
@@ -112,29 +111,29 @@ eae6320::cResult eae6320::Graphics::cEffect::Initialize_platformSpecific()
 							}
 							else
 							{
-								result = eae6320::Results::Failure;
+								o_result = eae6320::Results::Failure;
 								EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 								eae6320::Logging::OutputError("OpenGL failed to get link info of the program: %s",
 									reinterpret_cast<const char*>(gluErrorString(errorCode)));
-								return result;
+								return;
 							}
 						}
 						else
 						{
-							result = eae6320::Results::OutOfMemory;
+							o_result = eae6320::Results::OutOfMemory;
 							EAE6320_ASSERTF(false, "Couldn't allocate memory for the program link info");
 							eae6320::Logging::OutputError("Failed to allocate memory for the program link info");
-							return result;
+							return;
 						}
 					}
 				}
 				else
 				{
-					result = eae6320::Results::Failure;
+					o_result = eae6320::Results::Failure;
 					EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 					eae6320::Logging::OutputError("OpenGL failed to get the length of the program link info: %s",
 						reinterpret_cast<const char*>(gluErrorString(errorCode)));
-					return result;
+					return;
 
 				}
 			}
@@ -147,34 +146,32 @@ eae6320::cResult eae6320::Graphics::cEffect::Initialize_platformSpecific()
 				{
 					if ( didLinkingSucceed == GL_FALSE )
 					{
-						result = eae6320::Results::Failure;
+						o_result = eae6320::Results::Failure;
 						EAE6320_ASSERTF(false, linkInfo.c_str());
 						eae6320::Logging::OutputError("The program failed to link: %s",
 							linkInfo.c_str());
-						return result;
+						return;
 					}
 				}
 				else
 				{
-					result = eae6320::Results::Failure;
+					o_result = eae6320::Results::Failure;
 					EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 					eae6320::Logging::OutputError("OpenGL failed to find out if linking of the program succeeded: %s",
 						reinterpret_cast<const char*>(gluErrorString(errorCode)));
-					return result;
+					return;
 				}
 			}
 		}
 		else
 		{
-			result = eae6320::Results::Failure;
+			o_result = eae6320::Results::Failure;
 			EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
 			eae6320::Logging::OutputError("OpenGL failed to link the program: %s",
 				reinterpret_cast<const char*>(gluErrorString(errorCode)));
-			return result;
+			return;
 		}
 	}
-
-	return result;
 }
 
 void eae6320::Graphics::cEffect::Bind()

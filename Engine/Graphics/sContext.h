@@ -35,8 +35,6 @@
 	struct ID3D11Device;
 	struct ID3D11DeviceContext;
 	struct IDXGISwapChain;
-	struct ID3D11RenderTargetView;
-	struct ID3D11DepthStencilView;
 #endif
 
 // Class Declaration
@@ -65,9 +63,6 @@ namespace eae6320
 			// that are rendered to in sequence,
 			// with a single one being currently displayed
 			IDXGISwapChain* swapChain = nullptr;
-
-			ID3D11RenderTargetView* renderTargetView = nullptr;
-			ID3D11DepthStencilView* depthStencilView = nullptr;
 #elif defined( EAE6320_PLATFORM_GL )
 			// The device context and OpenGL rendering context are required to use OpenGL with Windows
 			// (i.e. they are Windows concepts and wouldn't be used on other platforms that use OpenGL)
@@ -85,7 +80,7 @@ namespace eae6320
 
 			// Initialize / Clean Up
 			//----------------------
-			cResult InitializeViews(const sInitializationParameters& i_initializationParameters);
+
 			cResult Initialize( const sInitializationParameters& i_initializationParameters );
 			cResult CleanUp();
 
@@ -93,8 +88,6 @@ namespace eae6320
 
 			// Implementation
 			//===============
-			void ClearImageBuffer(const float i_backGroundColor[]);
-			void ClearDepthBuffer();
 
 		private:
 

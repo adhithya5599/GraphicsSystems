@@ -3,14 +3,8 @@
 #ifndef EAE6320_GRAPHICS_CMESH_H
 #define EAE6320_GRAPHICS_CMESH_H
 
-#include "cVertexFormat.h"
-#include "sContext.h"
-#include "VertexFormats.h"
-
 #include <Engine/Results/Results.h>
-#include <Engine/Assets/ReferenceCountedAssets.h>
-#include <string>
-#include <cstdint>
+#include "cVertexFormat.h"
 
 #ifdef EAE6320_PLATFORM_GL
 #include "OpenGL/Includes.h"
@@ -18,6 +12,7 @@
 
 #ifdef EAE6320_PLATFORM_D3D
 struct ID3D11Buffer;
+struct ID3D11DeviceContext;
 #endif // EAE6320_PLATFORM_D3D
 
 namespace eae6320 
@@ -27,35 +22,27 @@ namespace eae6320
 		class cMesh
 		{
 			public:
-				//Factory function to initialize the mesh object
-				static cResult Load(cMesh*& o_mesh, const std::string& i_vertexMeshPath);
+				cResult InitializeGeometry();
+				cResult CleanUp();
 
+#if EAE6320_PLATFORM_D3D
+				void Draw(ID3D11DeviceContext* const i_direct3dImmediateContext);
+#elif EAE6320_PLATFORM_GL
 				void Draw();
+#endif
 
-				EAE6320_ASSETS_DECLAREREFERENCECOUNTINGFUNCTIONS();
-				EAE6320_ASSETS_DECLAREDELETEDREFERENCECOUNTEDFUNCTIONS(cMesh);
-			
-		private:
-				unsigned int m_indexCount = 0;
-				EAE6320_ASSETS_DECLAREREFERENCECOUNT();
+				//cMesh();
+				//~cMesh();
+
+			private:
 #ifdef EAE6320_PLATFORM_D3D
-				cVertexFormat* m_vertexFormat = nullptr;
+				eae6320::Graphics::cVertexFormat* m_vertexFormat = nullptr;
 				ID3D11Buffer* m_vertexBuffer = nullptr;
-				ID3D11Buffer* m_indexBuffer = nullptr;
 
 #elif EAE6320_PLATFORM_GL
 				GLuint m_vertexBufferId = 0;
 				GLuint m_vertexArrayId = 0;
-				GLuint m_indexBufferId = 0;
 #endif // EAE6320_PLATFORM_D3D
-				cResult InitializeGeometry(VertexFormats::sVertex_mesh i_vertexData[], const unsigned int i_vertexCount, uint16_t i_indexData[]);
-				cResult CleanUp();
-
-				cMesh(const unsigned int i_indexCount)
-					: m_indexCount(i_indexCount)
-				{
-				}
-				~cMesh();
 		};
 	}
 }

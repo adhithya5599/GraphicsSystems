@@ -1,10 +1,9 @@
 #include "../cMesh.h"
-
 #include "../VertexFormats.h"
 
 #include <Engine/Logging/Logging.h>
 
-eae6320::cResult eae6320::Graphics::cMesh::InitializeGeometry(eae6320::Graphics::VertexFormats::sVertex_mesh i_vertexData[], const unsigned int i_vertexCount, uint16_t i_indexData[])
+eae6320::cResult eae6320::Graphics::cMesh::InitializeGeometry()
 {
 	auto result = eae6320::Results::Success;
 
@@ -62,44 +61,41 @@ eae6320::cResult eae6320::Graphics::cMesh::InitializeGeometry(eae6320::Graphics:
 			return result;
 		}
 	}
-	// Create a index buffer object and make it active
-	{
-		constexpr GLsizei bufferCount = 1;
-		glGenBuffers(bufferCount, &m_indexBufferId);
-		const auto errorCode = glGetError();
-		if (errorCode == GL_NO_ERROR)
-		{
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferId);
-			const auto errorCode = glGetError();
-			if (errorCode != GL_NO_ERROR)
-			{
-				result = eae6320::Results::Failure;
-				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				eae6320::Logging::OutputError("OpenGL failed to bind a new vertex buffer: %s",
-					reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				return result;
-			}
-		}
-		else
-		{
-			result = eae6320::Results::Failure;
-			EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-			eae6320::Logging::OutputError("OpenGL failed to get an unused vertex buffer ID: %s",
-				reinterpret_cast<const char*>(gluErrorString(errorCode)));
-			return result;
-		}
-	}
 	// Assign the data to the buffer
 	{
-		const auto bufferSize = static_cast<GLsizeiptr>(sizeof(i_vertexData[0]) * i_vertexCount);
+		constexpr unsigned int triangleCount = 2;
+		constexpr unsigned int vertexCountPerTriangle = 3;
+		const auto vertexCount = triangleCount * vertexCountPerTriangle;
+		eae6320::Graphics::VertexFormats::sVertex_mesh vertexData[vertexCount];
+		{
+			// OpenGL is right-handed
+			vertexData[0].x = 0.0f;
+			vertexData[0].y = 0.0f;
+			vertexData[0].z = 0.0f;
+
+			vertexData[1].x = 1.0f;
+			vertexData[1].y = 0.0f;
+			vertexData[1].z = 0.0f;
+
+			vertexData[2].x = 1.0f;
+			vertexData[2].y = 1.0f;
+			vertexData[2].z = 0.0f;
+
+			vertexData[3].x = 1.0f;
+			vertexData[3].y = 1.0f;
+			vertexData[3].z = 0.0f;
+
+			vertexData[4].x = 0.0f;
+			vertexData[4].y = 1.0f;
+			vertexData[4].z = 1.0f;
+
+			vertexData[5].x = 0.0f;
+			vertexData[5].y = 0.0f;
+			vertexData[5].z = 0.0f;
+		}
+		constexpr auto bufferSize = sizeof(vertexData[0]) * vertexCount;
 		EAE6320_ASSERT(bufferSize <= std::numeric_limits<GLsizeiptr>::max());
-		glBufferData(GL_ARRAY_BUFFER, bufferSize, reinterpret_cast<GLvoid*>(i_vertexData),
-		// In our class we won't ever read from the buffer
-		GL_STATIC_DRAW);
-		
-		const auto indexBufferSize = static_cast<GLsizeiptr>(sizeof(i_indexData[0]) * m_indexCount);
-		EAE6320_ASSERT(indexBufferSize <= std::numeric_limits<GLsizeiptr>::max());
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBufferSize, reinterpret_cast<GLvoid*>(i_indexData),
+		glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(bufferSize), reinterpret_cast<GLvoid*>(vertexData),
 		// In our class we won't ever read from the buffer
 		GL_STATIC_DRAW);
 		const auto errorCode = glGetError();
@@ -117,7 +113,6 @@ eae6320::cResult eae6320::Graphics::cMesh::InitializeGeometry(eae6320::Graphics:
 		// The "stride" defines how large a single vertex is in the stream of data
 		// (or, said another way, how far apart each position element is)
 		constexpr auto stride = static_cast<GLsizei>(sizeof(eae6320::Graphics::VertexFormats::sVertex_mesh));
-		//constexpr auto colorStride = static_cast<GLsizei>(sizeof(eae6320::Graphics::VertexFormats::sVertex_color));
 			
 		// Position (0)
 		// 3 floats == 12 bytes
@@ -151,73 +146,6 @@ eae6320::cResult eae6320::Graphics::cMesh::InitializeGeometry(eae6320::Graphics:
 				return result;
 			}
 		}
-		
-		//COLOR (1)
-		//3 Unsigned int 8 bits == 3 bytes
-		//Offset = 12
-		{
-			constexpr GLuint vertexElementLocation = 1;
-			constexpr GLint elementCount = 4;
-			constexpr GLboolean notNormalized = GL_TRUE;	// The given values should be between 0-1
-			glVertexAttribPointer(vertexElementLocation, elementCount, GL_UNSIGNED_BYTE, notNormalized, stride,
-				reinterpret_cast<GLvoid*>(offsetof(eae6320::Graphics::VertexFormats::sVertex_mesh, r)));
-			const auto errorCode = glGetError();
-			if (errorCode == GL_NO_ERROR)
-			{
-				glEnableVertexAttribArray(vertexElementLocation);
-				const GLenum errorCode = glGetError();
-				if (errorCode != GL_NO_ERROR)
-				{
-					result = eae6320::Results::Failure;
-					EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-					eae6320::Logging::OutputError("OpenGL failed to enable the COLOR vertex attribute at location %u: %s",
-						vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-					return result;
-				}
-			}
-			else
-			{
-				result = eae6320::Results::Failure;
-				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				eae6320::Logging::OutputError("OpenGL failed to set the COLOR vertex attribute at location %u: %s",
-					vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				return result;
-			}
-		}
-
-		//TEXTURE (2)
-		//2 float 8 bits == 4 bytes
-		//Offset = 24
-		{
-			constexpr GLuint vertexElementLocation = 2;
-			constexpr GLint elementCount = 2;
-			constexpr GLboolean notNormalized = GL_FALSE;	// The given floats should be used as-is
-			glVertexAttribPointer(vertexElementLocation, elementCount, GL_FLOAT, notNormalized, stride,
-				reinterpret_cast<GLvoid*>(offsetof(eae6320::Graphics::VertexFormats::sVertex_mesh, u)));
-			const auto errorCode = glGetError();
-			if (errorCode == GL_NO_ERROR)
-			{
-				glEnableVertexAttribArray(vertexElementLocation);
-				const GLenum errorCode = glGetError();
-				if (errorCode != GL_NO_ERROR)
-				{
-					result = eae6320::Results::Failure;
-					EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-					eae6320::Logging::OutputError("OpenGL failed to enable the TEXTURE vertex attribute at location %u: %s",
-						vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-					return result;
-				}
-			}
-			else
-			{
-				result = eae6320::Results::Failure;
-				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				eae6320::Logging::OutputError("OpenGL failed to set the TEXTURE vertex attribute at location %u: %s",
-					vertexElementLocation, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				return result;
-			}
-		}
-
 	}
 	return result;
 }
@@ -238,12 +166,12 @@ void eae6320::Graphics::cMesh::Draw()
 		constexpr GLenum mode = GL_TRIANGLES;
 		// As of this comment only a single triangle is drawn
 		// (you will have to update this code in future assignments!)
-		//constexpr unsigned int triangleCount = 2;
-		//constexpr unsigned int indexCountPerTriangle = 3;
-		//constexpr auto indexCountToRender = triangleCount * indexCountPerTriangle;
+		constexpr unsigned int triangleCount = 2;
+		constexpr unsigned int vertexCountPerTriangle = 3;
+		constexpr auto vertexCountToRender = triangleCount * vertexCountPerTriangle;
 		// It's possible to start rendering primitives in the middle of the stream
-		const GLvoid* const offset = 0;
-		glDrawElements(mode, static_cast<GLsizei>(m_indexCount), GL_UNSIGNED_SHORT, offset);
+		constexpr unsigned int indexOfFirstVertexToRender = 0;
+		glDrawArrays(mode, indexOfFirstVertexToRender, vertexCountToRender);
 		EAE6320_ASSERT(glGetError() == GL_NO_ERROR);
 	}
 }
@@ -301,23 +229,6 @@ eae6320::cResult eae6320::Graphics::cMesh::CleanUp()
 					reinterpret_cast<const char*>(gluErrorString(errorCode)));
 			}
 			m_vertexBufferId = 0;
-		}
-		if (m_indexBufferId != 0)
-		{
-			constexpr GLsizei bufferCount = 1;
-			glDeleteBuffers(bufferCount, &m_indexBufferId);
-			const auto errorCode = glGetError();
-			if (errorCode != GL_NO_ERROR)
-			{
-				if (result)
-				{
-					result = Results::Failure;
-				}
-				EAE6320_ASSERTF(false, reinterpret_cast<const char*>(gluErrorString(errorCode)));
-				Logging::OutputError("OpenGL failed to delete the vertex buffer: %s",
-					reinterpret_cast<const char*>(gluErrorString(errorCode)));
-			}
-			m_indexBufferId = 0;
 		}
 	}
 	return result;

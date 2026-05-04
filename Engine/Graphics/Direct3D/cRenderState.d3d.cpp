@@ -168,9 +168,7 @@ eae6320::cResult eae6320::Graphics::cRenderState::Initialize( const uint8_t i_re
 			rasterizerStateDescription.FillMode = D3D11_FILL_SOLID;
 			// Triangles use left-handed winding order
 			// (opposite from OpenGL)
-			//rasterizerStateDescription.FrontCounterClockwise = FALSE;
-			// Triangles will be drawn based on right-handed winding order 
-			rasterizerStateDescription.FrontCounterClockwise = TRUE;
+			rasterizerStateDescription.FrontCounterClockwise = FALSE;
 			// No depth bias
 			rasterizerStateDescription.DepthBias = 0;
 			rasterizerStateDescription.SlopeScaledDepthBias = 0.0f;
