@@ -18,7 +18,6 @@ void main(
 	//======
 
 	in const float4 i_fragmentPosition : SV_POSITION,
-	in const float4 i_fragmentColor : COLOR,
 
 	// Output
 	//=======
@@ -29,41 +28,33 @@ void main(
 
 )
 #elif defined( EAE6320_PLATFORM_GL )
-layout( location = 1 ) in vec4 i_fragmentColor;
 out vec4 o_color;
 void main()
 #endif
 {
 	// Output solid white
-	//o_color = float4(
+	o_color = float4(
 		// RGB (color)
-		//1.0, 1.0, 1.0,
+		1.0, 1.0, 1.0,
 		// Alpha (opacity)
-		//1.0 );
-	float4 calculatedColor = float4(1.0, 1.0, 1.0, 1.0);
-	calculatedColor.g = 0.0;
-	calculatedColor.b = 0.6;
+		1.0 );
+	o_color.g = 0.0;
+	o_color.b = 0.6;
 	
 	if(sin(g_elapsedSecondCount_simulationTime) < 0)
 	{
-		calculatedColor.r = 1 - sin(g_elapsedSecondCount_simulationTime);
+		o_color.r = 1 - sin(g_elapsedSecondCount_simulationTime);
 	}
 	else
 	{
-		calculatedColor.r = sin(g_elapsedSecondCount_simulationTime);
+		o_color.r = sin(g_elapsedSecondCount_simulationTime);
 	}
 	if(cos(g_elapsedSecondCount_simulationTime) < 0)
 	{
-		calculatedColor.g = 1 - cos(g_elapsedSecondCount_simulationTime);
+		o_color.g = 1 - cos(g_elapsedSecondCount_simulationTime);
 	}
 	else
 	{
-		calculatedColor.g = cos(g_elapsedSecondCount_simulationTime);
+		o_color.g = cos(g_elapsedSecondCount_simulationTime);
 	}
-	//Vector multiplication for getting combined color
-	float r = TransfromVector(calculatedColor.r, i_fragmentColor.r);
-	float g = TransfromVector(calculatedColor.g, i_fragmentColor.g);
-	float b = TransfromVector(calculatedColor.b, i_fragmentColor.b);
-	float a = TransfromVector(calculatedColor.a, i_fragmentColor.a);
-	o_color = float4(r, g, b, a);
 }

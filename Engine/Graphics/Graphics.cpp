@@ -12,7 +12,6 @@
 #include <Engine/Math/cMatrix_transformation.h>
 #include <Engine/GameObject/cCamera.h>
 #include <Engine/Math/Functions.h>
-#include <Engine/Texture/cTexture.h>
 
 namespace
 {	
@@ -26,14 +25,12 @@ namespace
 	{
 		eae6320::Graphics::cEffect* effectData = nullptr;
 		eae6320::Graphics::cMesh* drawData = nullptr;
-		eae6320::Texture::cTexture* textureData = nullptr;
 		eae6320::Graphics::ConstantBufferFormats::sDrawCall drawData_frame;
-		unsigned int textureSlot = 0;
 	};
 
 	// This struct's data is populated at submission time;
 	// it must cache whatever is necessary in order to render a frame
-	constexpr unsigned int countDrawAndEffect = 200;
+	constexpr unsigned int countDrawAndEffect = 30;
 	struct sDataRequiredToRenderAFrame
 	{
 		eae6320::Graphics::ConstantBufferFormats::sFrame constantData_frame;
@@ -92,13 +89,13 @@ void eae6320::Graphics::SubmitBackgroundColorForANewFrame(const float i_redColor
 	backgroundColor_frame[2] = i_blueColorValue;
 }
 
-void eae6320::Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(eae6320::Graphics::cMesh*& o_mesh, eae6320::Graphics::cEffect*& o_effect, eae6320::Math::cMatrix_transformation& i_transform, eae6320::Texture::cTexture*& o_texture, unsigned int i_textureSlot)
+void eae6320::Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(eae6320::Graphics::cMesh*& o_mesh, eae6320::Graphics::cEffect*& o_effect, eae6320::Math::cMatrix_transformation& i_transform)
 {
 	EAE6320_ASSERT(s_dataBeingSubmittedByApplicationThread);
 	
 	auto& countRenderFrame_frame = s_dataBeingSubmittedByApplicationThread->countRenderFrame;
 	
-	if (countRenderFrame_frame >= countDrawAndEffect)
+	if (countRenderFrame_frame > countDrawAndEffect)
 	{
 		EAE6320_ASSERTF(false, "Couldn't get the new graphics data");
 		Logging::OutputError("Exceeded mesh and effect memory allocated");
@@ -117,16 +114,6 @@ void eae6320::Graphics::SubmitCoordinateWithOrderAndEffectForANewFrame(eae6320::
 
 	auto& drawData_frame = s_dataBeingSubmittedByApplicationThread->drawColorParameters[countRenderFrame_frame].drawData_frame;
 	drawData_frame.g_transform_localToWorld = i_transform;
-
-	auto& texture_data_frame = s_dataBeingSubmittedByApplicationThread->drawColorParameters[countRenderFrame_frame].textureData;
-	texture_data_frame = o_texture;
-	if (texture_data_frame)
-	{
-		texture_data_frame->IncrementReferenceCount();
-	}
-
-	auto& textureSlot_data_frame = s_dataBeingSubmittedByApplicationThread->drawColorParameters[countRenderFrame_frame].textureSlot;
-	textureSlot_data_frame = i_textureSlot;
 
 	++countRenderFrame_frame;
 }
@@ -212,8 +199,6 @@ void eae6320::Graphics::RenderFrame()
 	{
 		auto& mesh_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].drawData;
 		auto& effect_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].effectData;
-		auto& texture_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].textureData;
-		auto& textureSlot_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].textureSlot;
 
 		//Update the draw constant buffer
 		{
@@ -224,13 +209,6 @@ void eae6320::Graphics::RenderFrame()
 		// Bind the shading data
 		{
 			effect_data_frame->Bind();
-		}
-		//Bind the texture data
-		{
-			if (texture_data_frame)
-			{
-				texture_data_frame->Bind(textureSlot_data_frame);
-			}
 		}
 		// Draw the geometry
 		{
@@ -246,11 +224,6 @@ void eae6320::Graphics::RenderFrame()
 		{
 			effect_data_frame->DecrementReferenceCount();
 			effect_data_frame = nullptr;
-		}
-		if (texture_data_frame)
-		{
-			texture_data_frame->DecrementReferenceCount();
-			texture_data_frame = nullptr;
 		}
 	}
 	countRenderFrame_frame = 0;
@@ -345,7 +318,6 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 		{
 			auto& mesh_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].drawData;
 			auto& effect_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].effectData;
-			auto& texture_data_frame = s_dataBeingRenderedByRenderThread->drawColorParameters[i].textureData;
 			if (mesh_data_frame)
 			{
 				mesh_data_frame->DecrementReferenceCount();
@@ -355,11 +327,6 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 			{
 				effect_data_frame->DecrementReferenceCount();
 				effect_data_frame = nullptr;
-			}
-			if (texture_data_frame)
-			{
-				texture_data_frame->DecrementReferenceCount();
-				texture_data_frame = nullptr;
 			}
 		}
 	}
@@ -369,7 +336,6 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 		{
 			auto& mesh_data_frame = s_dataBeingSubmittedByApplicationThread->drawColorParameters[i].drawData;
 			auto& effect_data_frame = s_dataBeingSubmittedByApplicationThread->drawColorParameters[i].effectData;
-			auto& texture_data_frame = s_dataBeingSubmittedByApplicationThread->drawColorParameters[i].textureData;
 			if (mesh_data_frame)
 			{
 				mesh_data_frame->DecrementReferenceCount();
@@ -379,11 +345,6 @@ eae6320::cResult eae6320::Graphics::CleanUp()
 			{
 				effect_data_frame->DecrementReferenceCount();
 				effect_data_frame = nullptr;
-			}
-			if (texture_data_frame)
-			{
-				texture_data_frame->DecrementReferenceCount();
-				texture_data_frame = nullptr;
 			}
 		}
 	}
