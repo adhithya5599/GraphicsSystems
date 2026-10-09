@@ -35,8 +35,8 @@ namespace eae6320
 				~cCamera();
 
 				const Math::cMatrix_transformation GetCameraTransform();
-				const Math::sVector GetCameraPosition() const;
-				const Math::cQuaternion GetCameraRotation() const;
+				//const Math::sVector GetCameraPosition() const;
+				//const Math::cQuaternion GetCameraRotation() const;
 				const Math::cMatrix_transformation GetCameraConfigurations();
 
 				Physics::sRigidBodyState*& GetRigidBodyState();

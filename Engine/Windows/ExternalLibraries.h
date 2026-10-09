@@ -10,6 +10,7 @@
 #pragma comment( lib, "Kernel32.lib" )
 #pragma comment( lib, "Shell32.lib" )
 #pragma comment( lib, "Shlwapi.lib" )
+#pragma comment( lib, "Ole32.lib" )
 
 #if defined( EAE6320_PLATFORM_GL )
 

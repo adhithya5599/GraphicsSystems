@@ -143,6 +143,9 @@
     <ProjectReference Include="..\ScopeGuard\ScopeGuard.vcxproj">
       <Project>{b7ed3f7d-bfa1-42c9-9089-c6401ffde3d4}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\Texture\Texture.vcxproj">
+      <Project>{fb8e9a70-6d6e-43c6-b6bc-155bbffd38c7}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Windows\Windows.vcxproj">
       <Project>{6ff846d1-2377-4601-b2f6-83e31748cb16}</Project>
     </ProjectReference>

@@ -76,3 +76,8 @@ eae6320::cResult eae6320::Platform::WriteBinaryFile( const char* const i_path, c
 {
 	return Windows::WriteBinaryFile( i_path, i_data, i_size, o_errorMessage );
 }
+
+std::string eae6320::Platform::GetAppDataFolderPath()
+{
+	return Windows::GetAppDataFolderPath();
+}

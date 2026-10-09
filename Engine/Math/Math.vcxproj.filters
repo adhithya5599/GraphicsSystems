@@ -5,6 +5,9 @@
     <ClCompile Include="cQuaternion.cpp" />
     <ClCompile Include="Functions.cpp" />
     <ClCompile Include="sVector.cpp" />
+    <ClCompile Include="sRectangle.cpp" />
+    <ClCompile Include="sVector2D.cpp" />
+    <ClCompile Include="sVector2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cMatrix_transformation.h" />
@@ -12,11 +15,17 @@
     <ClInclude Include="cQuaternion.h" />
     <ClInclude Include="Functions.h" />
     <ClInclude Include="sVector.h" />
+    <ClInclude Include="sRectangle.h" />
+    <ClInclude Include="sVector2D.h" />
+    <ClInclude Include="sVector2.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Functions.inl" />
     <None Include="sVector.inl" />
     <None Include="cQuaternion.inl" />
     <None Include="cMatrix_transformation.inl" />
+    <None Include="sRectangle.inl" />
+    <None Include="sVector2D.inl" />
+    <None Include="sVector2.inl" />
   </ItemGroup>
 </Project>

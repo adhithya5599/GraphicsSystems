@@ -10,7 +10,7 @@
 #include <Engine/Graphics/cEffect.h>
 #include <Engine/GameObject/cGameObject.h>
 #include <Engine/Math/cMatrix_transformation.h>
-#include <Engine/Physics/sRigidBodyState.h>
+//#include <Engine/Physics/sRigidBodyState.h>
 #include <Engine/GameObject/cCamera.h>
 #include <Engine/Texture/cTexture.h>
 
@@ -100,9 +100,9 @@ void eae6320::cMyGame::UpdateBasedOnInput()
 
 void eae6320::cMyGame::UpdateSimulationBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate)
 {
-	camera->GetRigidBodyState()->Update(i_elapsedSecondCount_sinceLastUpdate);
+	//camera->GetRigidBodyState()->Update(i_elapsedSecondCount_sinceLastUpdate);
 
-	playerObject->GetRigidBodyState()->Update(i_elapsedSecondCount_sinceLastUpdate);
+	//playerObject->GetRigidBodyState()->Update(i_elapsedSecondCount_sinceLastUpdate);
 }
 
 void eae6320::cMyGame::UpdateSimulationBasedOnInput()
@@ -126,16 +126,16 @@ void eae6320::cMyGame::UpdateSimulationBasedOnInput()
 	else
 		playerObject->GetRigidBodyState()->velocity = { 0.0f, 0.0f, 0.0f };
 
-	if (UserInput::IsKeyPressed(UserInput::KeyCodes::W))
-		camera->GetRigidBodyState()->velocity = {0.0f, -1.0f, 0.f};
-	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::A))
-		camera->GetRigidBodyState()->velocity = { 1.0f, 0.f, 0.f };
-	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::S))
-		camera->GetRigidBodyState()->velocity = { 0.0f, 1.f, 0.f };
-	else if (UserInput::IsKeyPressed(UserInput::KeyCodes::D))
-		camera->GetRigidBodyState()->velocity = { -1.0f, 0.f, 0.f };
-	else
-		camera->GetRigidBodyState()->velocity = {0.f, 0.f, 0.f};
+	//if (UserInput::IsKeyPressed(UserInput::KeyCodes::W))
+	//	camera->GetRigidBodyState()->velocity = {0.0f, -1.0f, 0.f};
+	//else if (UserInput::IsKeyPressed(UserInput::KeyCodes::A))
+	//	camera->GetRigidBodyState()->velocity = { 1.0f, 0.f, 0.f };
+	//else if (UserInput::IsKeyPressed(UserInput::KeyCodes::S))
+	//	camera->GetRigidBodyState()->velocity = { 0.0f, 1.f, 0.f };
+	//else if (UserInput::IsKeyPressed(UserInput::KeyCodes::D))
+	//	camera->GetRigidBodyState()->velocity = { -1.0f, 0.f, 0.f };
+	//else
+	//	camera->GetRigidBodyState()->velocity = {0.f, 0.f, 0.f};
 
 }
 

@@ -98,7 +98,16 @@ void eae6320::Graphics::SubmitElapsedTime(const float i_elapsedSecondCount_syste
 	constantData_frame.g_elapsedSecondCount_simulationTime = i_elapsedSecondCount_simulationTime;	
 }
 
-void eae6320::Graphics::SubmitCameraDataForANewFrame(eae6320::GameObject::cCamera* i_camera, eae6320::Math::cMatrix_transformation& i_transform)
+//void eae6320::Graphics::SubmitCameraDataForANewFrame(eae6320::GameObject::cCamera* i_camera, eae6320::Math::cMatrix_transformation& i_transform)
+//{
+//	EAE6320_ASSERT(s_dataBeingSubmittedByApplicationThread);
+//	auto& constantData_frame = s_dataBeingSubmittedByApplicationThread->constantData_frame;
+//	constantData_frame.g_transform_worldToCamera = i_transform;
+//	constantData_frame.g_transform_cameraToProjected = i_camera->GetCameraConfigurations();
+//
+//}
+
+void eae6320::Graphics::SubmitCameraDataForANewFrame(const eae6320::Math::sVector& i_position, const eae6320::Math::cQuaternion& i_orientation, float i_fieldOfView, float i_aspectRatio, float i_nearZPlane, float i_farZPlane)
 {
 	EAE6320_ASSERT(s_dataBeingSubmittedByApplicationThread);
 	auto& constantData_frame = s_dataBeingSubmittedByApplicationThread->constantData_frame;
@@ -118,6 +127,7 @@ void eae6320::Graphics::SubmitCameraDataForANewFrame(eae6320::GameObject::cCamer
 		constantData_frame.g_cameraPosition_world[3] = 1.0f;
 	}
 
+	constantData_frame.g_transform_cameraToProjected = eae6320::Math::cMatrix_transformation::CreateCameraToProjectedTransform_perspective(i_fieldOfView, i_aspectRatio, i_nearZPlane, i_farZPlane);
 }
 
 void eae6320::Graphics::SubmitBackgroundColorForANewFrame(const float i_redColorValue, const float i_greenColorValue, const float i_blueColorValue)

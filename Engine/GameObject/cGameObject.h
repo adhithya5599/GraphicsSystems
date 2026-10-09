@@ -18,7 +18,7 @@ namespace eae6320
 
 	namespace Physics
 	{
-		struct sRigidBodyState;
+		class PhysicsBody2D;
 	}
 }
 
@@ -32,10 +32,11 @@ namespace eae6320
 			cMyGameObject(Graphics::cMesh*& o_mesh, Graphics::cEffect*& o_effect);
 			~cMyGameObject();
 
-			Graphics::cMesh*& GetMesh();
-			Graphics::cEffect*& GetEffect();
+			inline Graphics::cMesh*& GetMesh() { return m_Mesh; };
+			inline Graphics::cEffect*& GetEffect() { return m_Effect; };
 
-			Physics::sRigidBodyState* GetRigidBodyState();
+			//Physics::sRigidBodyState* GetRigidBodyState();
+			inline Physics::PhysicsBody2D*& GetPhysicsBody2D() { return m_PhysicsBody2D; };
 
 		private:
 			// These must start as nullptr:
@@ -45,6 +46,8 @@ namespace eae6320
 			Graphics::cEffect* m_Effect = nullptr;
 
 			Physics::sRigidBodyState* m_RigidBodyState = nullptr;
+			//Physics::sRigidBodyState* m_RigidBodyState;
+			Physics::PhysicsBody2D* m_PhysicsBody2D;
 		};
 	}
 }

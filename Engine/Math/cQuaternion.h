@@ -60,8 +60,46 @@ namespace eae6320
 			// it is more efficient to extract the forward direction from that
 			constexpr sVector CalculateForwardDirection() const;
 
+			// (CameraControls new operations)
+			//================================
+
+			// Magnitude
+			//----------
+
+			float Magnitude() const;
+			float SqrMagnitude() const;
+
+			// Eulers
+			//-------
+
+			// NOTE: angles are in radians
+
+			sVector EulerAngles() const;
+			static cQuaternion FromEulerAngles(const sVector& i_eulerAngles);
+
+			// Angle/axis
+			//-----------
+
+			sVector Axis() const;
+
+			static float AngleBetween(const cQuaternion& i_a, const cQuaternion& i_b);
+
+			// Lerp
+			//-----
+
+			static cQuaternion Slerp(const cQuaternion& i_from, const cQuaternion& i_to, float i_time);
+			static cQuaternion SlerpUnclamped(const cQuaternion& i_from, const cQuaternion& i_to, float i_time);
+
+			// Look
+			//-----
+
+			static cQuaternion LookRotation(const sVector& i_forward, const sVector& i_up);
+
+			// (end CameraControls new operations)
+
 			// Initialization / Clean Up
 			//--------------------------
+			constexpr cQuaternion(const float i_w, const float i_x, const float i_y, const float i_z);
 
 			constexpr cQuaternion() = default;	// Identity
 			cQuaternion( const float i_angleInRadians,	// A positive angle rotates counter-clockwise (right-handed) around the axis
@@ -69,6 +107,10 @@ namespace eae6320
 
 			// Data
 			//=====
+			float GetX() const { return m_x; }
+			float GetY() const { return m_y; }
+			float GetZ() const { return m_z; }
+			float GetW() const { return m_w; }
 
 		private:
 
@@ -85,7 +127,7 @@ namespace eae6320
 			// Initialization / Clean Up
 			//--------------------------
 
-			constexpr cQuaternion( const float i_w, const float i_x, const float i_y, const float i_z );
+			//constexpr cQuaternion( const float i_w, const float i_x, const float i_y, const float i_z );
 
 			// Friends
 			//========

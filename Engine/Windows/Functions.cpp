@@ -1130,6 +1130,23 @@ eae6320::cResult eae6320::Windows::WriteBinaryFile( const char* const i_path, co
 	return Results::Success;
 }
 
+std::string eae6320::Windows::GetAppDataFolderPath()
+{
+	std::string appDataFolderPath;
+	// Get the path to the AppData\Roaming folder
+	wchar_t* path_cstr = nullptr;
+	if ( SUCCEEDED( SHGetKnownFolderPath( FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &path_cstr ) ) )
+	{
+		appDataFolderPath = ConvertUtf16ToUtf8( path_cstr );
+		CoTaskMemFree( path_cstr );
+	}
+	else
+	{
+		//EAE6320_ASSERTF( false, "Failed to get the AppData\\Roaming folder path" );
+	}
+	return appDataFolderPath;
+}
+
 // Helper Definitions
 //===================
 

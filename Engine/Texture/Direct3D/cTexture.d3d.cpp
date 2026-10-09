@@ -17,12 +17,14 @@ eae6320::cResult eae6320::Texture::cTexture::InitializeTexture()
 		textureDescription.ArraySize = 1;
 		textureDescription.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		textureDescription.SampleDesc.Count = 1;
-		textureDescription.Usage = D3D11_USAGE_DEFAULT;
+		//textureDescription.Usage = D3D11_USAGE_DEFAULT;
+		textureDescription.Usage = D3D11_USAGE_IMMUTABLE;
 		textureDescription.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 
 		D3D11_SUBRESOURCE_DATA initialData{};
 		initialData.pSysMem = m_pixels;
 		initialData.SysMemPitch = m_width * m_componentsPerPixel;
+		initialData.SysMemSlicePitch = 0;
 
 		ID3D11Texture2D* texture = nullptr;
 		
@@ -49,7 +51,13 @@ eae6320::cResult eae6320::Texture::cTexture::InitializeTexture()
 		}
 
 		{
-			const auto result_create = direct3dDevice->CreateShaderResourceView(texture, nullptr, &m_textureView);
+			D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDescription{};
+			shaderResourceViewDescription.Format = textureDescription.Format;
+			shaderResourceViewDescription.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			shaderResourceViewDescription.Texture2D.MipLevels = textureDescription.MipLevels;
+			shaderResourceViewDescription.Texture2D.MostDetailedMip = 0;
+
+			const auto result_create = direct3dDevice->CreateShaderResourceView(texture, &shaderResourceViewDescription, &m_textureView);
 			if (FAILED(result_create))
 			{
 				result = eae6320::Results::Failure;

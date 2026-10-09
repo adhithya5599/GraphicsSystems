@@ -25,6 +25,8 @@ namespace eae6320
 	namespace Math
 	{
 		class cMatrix_transformation;
+		class cQuaternion;
+		struct sVector;
 	}
 
 	namespace GameObject
@@ -56,7 +58,9 @@ namespace eae6320
 		//Submit the Camera data
 		// the values are the camera object, the vertical field of view, focal length, near plane and far plane
 		//void SubmitCameraDataForANewFrame(cCamera* i_camera, const float i_verticalFieldOfView, const float i_focalLength, const float i_nearPlaneDistance, const float i_farPlaneDistance);
-		void SubmitCameraDataForANewFrame(GameObject::cCamera* i_camera, eae6320::Math::cMatrix_transformation& i_transform);
+		//void SubmitCameraDataForANewFrame(GameObject::cCamera* i_camera, eae6320::Math::cMatrix_transformation& i_transform);
+		void SubmitCameraDataForANewFrame(const Math::sVector& i_position, const Math::cQuaternion& i_orientation, float i_fieldOfView, float i_aspectRatio, float i_nearZPlane, float i_farZPlane);
+
 		//Submit the background color data for the new frame
 		//the values for red, green and blue should be between 0.0f to 1.0f
 		void SubmitBackgroundColorForANewFrame(const float i_redColorValue, const float i_greenColorValue, const float i_blueColorValue);

@@ -42,6 +42,14 @@ eae6320::cResult eae6320::Assets::cTextureBuilder::Build(const std::vector<std::
 			const uint32_t height = *reinterpret_cast<const uint32_t*>(imageData + 22);
 			const uint16_t planes = *reinterpret_cast<const uint16_t*>(imageData + 26);
 			const uint16_t bitsPerPixel = *reinterpret_cast<const uint16_t*>(imageData + 28);
+
+			if(bitsPerPixel != 24 && bitsPerPixel != 32)
+			{
+				result = Results::InvalidFile;
+				OutputErrorMessageWithFileInfo(m_path_source,"Only 24-bit and 32-bit BMP textures are supported");
+				return result;
+			}
+
 			const uint16_t compression = *reinterpret_cast<const uint16_t*>(imageData + 30);
 
 			if (compression != 0)
@@ -50,21 +58,56 @@ eae6320::cResult eae6320::Assets::cTextureBuilder::Build(const std::vector<std::
 				return result;
 			}
 
-			const uint8_t componentsPerPixel = bitsPerPixel / 8;
+			const uint8_t componentsPerPixel = static_cast<uint8_t>(bitsPerPixel / 8);
 			const uint8_t* const pixelData = imageData + pixelDataOffset;
+
+			const uint32_t rowSize = ((width * componentsPerPixel + 3) & ~3);
+			const uint32_t finalComponents = 4;
 
 			{
 				s_imageData.width = width;
 				s_imageData.height = height;
-				s_imageData.componentsPerPixel = componentsPerPixel;
-				s_imageData.pixels = reinterpret_cast<uint8_t*>(malloc(width * height * componentsPerPixel));
+				s_imageData.componentsPerPixel = finalComponents;
+				//s_imageData.pixels = reinterpret_cast<uint8_t*>(malloc(width * height * componentsPerPixel));
+				const size_t totalPixels = static_cast<size_t>(width) * static_cast<size_t>(height);
+				const size_t pixelSize = totalPixels * static_cast<size_t>(finalComponents);
+
+				s_imageData.pixels = new uint8_t[pixelSize];
 
 				if (!s_imageData.pixels)
 				{
 					result = Results::OutOfMemory;
 					return result;
 				}
-				memcpy(s_imageData.pixels, pixelData, width * height * componentsPerPixel);
+
+				const uint32_t rowStride = width * finalComponents;
+
+				for (uint32_t y = 0; y < height; ++y)
+				{
+					const uint8_t* const sourceRow = pixelData + (height - 1 - y) * rowSize;
+					uint8_t* const destinationRow = s_imageData.pixels + (static_cast<size_t>(y) * rowStride);
+
+					for(uint32_t i = 0; i < width; ++i)
+					{
+						const uint8_t* const sourcePixel = sourceRow + i * componentsPerPixel;
+						uint8_t* const destinationPixel = destinationRow + i * finalComponents;
+						
+						const uint8_t blue = sourcePixel[0];
+						const uint8_t green = sourcePixel[1];
+						const uint8_t red = sourcePixel[2];
+						uint8_t alpha = 0xFF;
+						
+						if(componentsPerPixel == 4)
+						{
+							alpha = sourcePixel[3];
+						}
+
+						destinationPixel[0] = blue;
+						destinationPixel[1] = green;
+						destinationPixel[2] = red;
+						destinationPixel[3] = alpha; // Alpha channel
+					}
+				}
 			}
 		}
 	}

@@ -22,20 +22,29 @@
     <ClCompile Include="cMatrix_transformation.cpp" />
     <ClCompile Include="cQuaternion.cpp" />
     <ClCompile Include="Functions.cpp" />
+    <ClCompile Include="sRectangle.cpp" />
     <ClCompile Include="sVector.cpp" />
+    <ClCompile Include="sVector2.cpp" />
+    <ClCompile Include="sVector2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cMatrix_transformation.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="cQuaternion.h" />
     <ClInclude Include="Functions.h" />
+    <ClInclude Include="sRectangle.h" />
     <ClInclude Include="sVector.h" />
+    <ClInclude Include="sVector2.h" />
+    <ClInclude Include="sVector2D.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cMatrix_transformation.inl" />
     <None Include="cQuaternion.inl" />
     <None Include="Functions.inl" />
+    <None Include="sRectangle.inl" />
     <None Include="sVector.inl" />
+    <None Include="sVector2.inl" />
+    <None Include="sVector2D.inl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Asserts\Asserts.vcxproj">
