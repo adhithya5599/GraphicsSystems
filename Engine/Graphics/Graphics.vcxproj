@@ -128,9 +128,6 @@
     <ProjectReference Include="..\Concurrency\Concurrency.vcxproj">
       <Project>{60ff1b7f-04ec-40ae-bded-5fe1742da10e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\GameObject\GameObject.vcxproj">
-      <Project>{d588db20-0924-4b74-bea2-8e2e3bd06d8e}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\Lighting\Lighting.vcxproj">
       <Project>{d141e714-53c4-4b8e-8d79-154d4872cbd7}</Project>
     </ProjectReference>

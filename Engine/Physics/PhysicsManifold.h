@@ -6,7 +6,7 @@ namespace eae6320
 {
 	namespace Physics
 	{
-		// 用于在判断完Collide阶段后，存储信息，供后面ResolveCollision阶段使用
+		// Stores what the Collide step found so that the ResolveCollision step can use it afterwards
 		struct PhysicsManifold
 		{
 			PhysicsBody2D* BodyA;

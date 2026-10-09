@@ -4,6 +4,9 @@
     <Filter Include="Resource Files">
       <UniqueIdentifier>{03031ccc-db13-4533-ac30-ff150a5983e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Gameplay">
+      <UniqueIdentifier>{396aeda3-234a-48a7-b08f-59426ffa288f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resource Files\eaeAlien.ico">
@@ -32,9 +35,48 @@
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="cOneShotGame.h" />
+    <ClInclude Include="cArrow.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="cKeyPressTracker.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="cObstacleCourse.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="cShotCameraRig.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="GameplaySettings.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="OneShotLock.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="sGameAssets.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cOneShotGame.cpp" />
     <ClCompile Include="EntryPoint.cpp" />
+    <ClCompile Include="cArrow.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="cKeyPressTracker.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="cObstacleCourse.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="cShotCameraRig.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="OneShotLock.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="sGameAssets.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

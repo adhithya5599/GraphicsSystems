@@ -1,17 +1,30 @@
 ﻿#include "cPhysicsBody2D.h"
 #include <Engine/Math/Constants.h>
-#include <Engine/GameObject/cGameObject.h>
-#include <MyGame_/MyGame/cMyGame.h>
 #include "cPhysicsWorld.h"
 #include "PhysicsUtil.h"
 #include <Engine/Logging/Logging.h>
+
+#include <cfloat>
+#include <cstdio>
+
+namespace
+{
+	// Formats an error message for the body factory functions
+	template <typename... tArguments>
+	std::string FormatErrorMessage(const char* const i_format, tArguments... i_arguments)
+	{
+		char buffer[256];
+		std::snprintf(buffer, sizeof(buffer), i_format, i_arguments...);
+		return buffer;
+	}
+}
 
 eae6320::Physics::PhysicsBody2D::PhysicsBody2D(
 	 float i_density, float i_mass, float i_inertia, float i_restitution, float i_area,
 	bool i_isStatic, float i_radius, float i_width, float i_height, const std::vector<Math::sVector>& i_vertices, EShapeType i_shapeType)
 	:Density(i_density), Mass(i_mass), Inertia(i_inertia), Restitution(i_restitution), Area(i_area), bIsStatic(i_isStatic),
 	Radius(i_radius), Width(i_width), Height(i_height), ShapeType(i_shapeType),
-	InvMass(i_mass > 0.f ? (i_isStatic ? 0.f : 1.f / i_mass) : 0),// 使用值为0的Inverse Mass来代表静态物体
+	InvMass(i_mass > 0.f ? (i_isStatic ? 0.f : 1.f / i_mass) : 0),// An inverse mass of 0 represents a static (immovable) body
 	m_aabb(0, 0, 0, 0)
 {
 	InvInertia = Inertia > 0.f ? (bIsStatic? 0.f : 1.f / Inertia) : 0.f;
@@ -59,13 +72,19 @@ eae6320::cResult eae6320::Physics::PhysicsBody2D::CleanUp()
 
 void eae6320::Physics::PhysicsBody2D::Step(float i_deltatime, const Math::sVector2& i_gravity, const int i_iterations)
 {
+	// A static body never moves, so any force on it is thrown away
+	// (now that forces accumulate, keeping them would make a static body's unused velocity grow forever)
+	if (bIsStatic)
+	{
+		Force = Math::sVector2::Zero();
+		return;
+	}
+
 	if (std::abs(Mass) > 0.0001f)
 	{
 		Math::sVector2 acceleration = Force / Mass;
 		velocity += acceleration * i_deltatime;
 	}
-
-	if (bIsStatic) return;
 
 	i_deltatime /= (float)i_iterations;
 
@@ -104,8 +123,8 @@ float eae6320::Physics::PhysicsBody2D::CalculateRotationalInertia()
 	}
 	else
 	{
-		return 0.f;
 		Logging::OutputError("Shape type for calculating rotational inertia is not a valid shape type");
+		return 0.f;
 	}
 }
 
@@ -133,7 +152,8 @@ const eae6320::Math::sVector2 eae6320::Physics::PhysicsBody2D::PredictFuturePosi
 
 const eae6320::Math::cQuaternion eae6320::Physics::PhysicsBody2D::PredictFutureOrientation(const float i_secondCountToExtrapolate) const
 {
-	return Math::cQuaternion();
+	// A 2D body rotates around the axis that points out of the 2D plane
+	return Util::ConvertRotation2DTo3D(angle + (angularVelocity * i_secondCountToExtrapolate));
 }
 
 const eae6320::Math::cMatrix_transformation eae6320::Physics::PhysicsBody2D::PredictFutureTransform(const float i_secondCountToExtrapolate) const
@@ -179,7 +199,9 @@ void eae6320::Physics::PhysicsBody2D::RotateTo(float i_angle)
 
 void eae6320::Physics::PhysicsBody2D::AddForce(const Math::sVector2& i_amount)
 {
-	Force = i_amount;
+	// Forces accumulate until the next Step() (which applies and then clears them),
+	// so that two systems pushing the same body in the same frame both have an effect
+	Force += i_amount;
 }
 
 
@@ -204,8 +226,10 @@ eae6320::Physics::AABB eae6320::Physics::PhysicsBody2D::GetAABB()
 	{
 		float minX = FLT_MAX;
 		float minY = FLT_MAX;
-		float maxX = FLT_MIN;
-		float maxY = FLT_MAX;
+		// The maximums must start at the most negative float so that any vertex is bigger
+		// (FLT_MIN is the smallest _positive_ float, not the most negative one)
+		float maxX = -FLT_MAX;
+		float maxY = -FLT_MAX;
 		if (ShapeType == EShapeType::Box)
 		{
 			auto vertices = GetTransformedVertices2D();
@@ -303,25 +327,25 @@ std::unique_ptr<eae6320::Physics::PhysicsBody2D> eae6320::Physics::CreateCircleB
 
 	if (area < Physics::cPhysicsWorld::MinBodySize)
 	{
-		snprintf(errorMessage.data(), errorMessage.size(), "area is too small. Min area is %f", Physics::cPhysicsWorld::MinBodySize);
+		errorMessage = FormatErrorMessage("area is too small. Min area is %f", Physics::cPhysicsWorld::MinBodySize);
 		return nullptr;
 	}
 
 	if (area > Physics::cPhysicsWorld::MaxBodySize)
 	{
-		snprintf(errorMessage.data(), errorMessage.size(), "area is too large. Max area is %f", Physics::cPhysicsWorld::MaxBodySize);
+		errorMessage = FormatErrorMessage("area is too large. Max area is %f", Physics::cPhysicsWorld::MaxBodySize);
 		return nullptr;
 	}
 
 	if (i_density < Physics::cPhysicsWorld::MinDensity)
 	{
-		snprintf(errorMessage.data(), errorMessage.size(), "density is too small. Min density is %f", Physics::cPhysicsWorld::MinDensity);
+		errorMessage = FormatErrorMessage("density is too small. Min density is %f", Physics::cPhysicsWorld::MinDensity);
 		return nullptr;
 	}
 
 	if (i_density > Physics::cPhysicsWorld::MaxDensity)
 	{
-		snprintf(errorMessage.data(), errorMessage.size(), "density is too large. Max density is %f", Physics::cPhysicsWorld::MaxDensity);
+		errorMessage = FormatErrorMessage("density is too large. Max density is %f", Physics::cPhysicsWorld::MaxDensity);
 		return nullptr;
 	}
 
@@ -417,25 +441,25 @@ std::unique_ptr<eae6320::Physics::PhysicsBody2D> eae6320::Physics::CreateBoxBody
 
 	if (area < Physics::cPhysicsWorld::MinBodySize)
 	{
-		snprintf(errorMessage.data(), errorMessage.size(), "area is too small. Min area is %f", Physics::cPhysicsWorld::MinBodySize);
+		errorMessage = FormatErrorMessage("area is too small. Min area is %f", Physics::cPhysicsWorld::MinBodySize);
 		return nullptr;
 	}
 
 	if (area > Physics::cPhysicsWorld::MaxBodySize)
 	{
-		snprintf(errorMessage.data(), errorMessage.size(), "area is too large. Max area is %f", Physics::cPhysicsWorld::MaxBodySize);
+		errorMessage = FormatErrorMessage("area is too large. Max area is %f", Physics::cPhysicsWorld::MaxBodySize);
 		return nullptr;
 	}
 
 	if (i_density < Physics::cPhysicsWorld::MinDensity)
 	{
-		snprintf(errorMessage.data(), errorMessage.size(), "density is too small. Min density is %f", Physics::cPhysicsWorld::MinDensity);
+		errorMessage = FormatErrorMessage("density is too small. Min density is %f", Physics::cPhysicsWorld::MinDensity);
 		return nullptr;
 	}
 
 	if (i_density > Physics::cPhysicsWorld::MaxDensity)
 	{
-		snprintf(errorMessage.data(), errorMessage.size(), "density is too large. Max density is %f", Physics::cPhysicsWorld::MaxDensity);
+		errorMessage = FormatErrorMessage("density is too large. Max density is %f", Physics::cPhysicsWorld::MaxDensity);
 		return nullptr;
 	}
 

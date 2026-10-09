@@ -3,8 +3,6 @@
 #include <Engine/Math/sVector2.h>
 #include <Engine/Results/cResult.h>
 #include <Engine/Physics/AABB.h>
-#include <Engine/Graphics/cMesh.h>
-#include <Engine/Graphics/cEffect.h>
 #include <Engine/Math/cMatrix_transformation.h>
 
 #include <memory>
@@ -60,7 +58,7 @@ namespace eae6320
 			const EShapeType ShapeType;
 			const float Density;
 			const float Mass;
-			// 很多计算用到mass的倒数：1/Mass，所以预计算倒数
+			// Many calculations use the inverse of the mass (1 / Mass), so it is calculated once up front
 			const float InvMass;
 			const float Restitution;
 			const float Area;
@@ -103,9 +101,6 @@ namespace eae6320
 			friend class eae6320::Physics::cPhysicsWorld;
 
 			bool m_bEnableDebugDraw = true;
-			
-			eae6320::Graphics::cMesh* m_debugMesh = nullptr;
-			eae6320::Graphics::cEffect* m_debugEffect = nullptr;
 		};
 		std::unique_ptr<PhysicsBody2D> CreateBoxBody(float i_width, float i_height, float i_density, bool i_isStatic, float i_restitution, std::string& errorMessage);
 		std::unique_ptr<PhysicsBody2D> CreateBoxBody(float i_width, float i_height, float i_density, bool i_isStatic, float i_restitution);

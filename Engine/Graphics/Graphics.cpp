@@ -10,7 +10,6 @@
 #include <Engine/Logging/Logging.h>
 #include <Engine/UserOutput/UserOutput.h>
 #include <Engine/Math/cMatrix_transformation.h>
-#include <Engine/GameObject/cCamera.h>
 #include <Engine/Lighting/cSceneLighting.h>
 #include <Engine/Math/Functions.h>
 #include <Engine/Texture/cTexture.h>
@@ -74,7 +73,6 @@ namespace
 	// (the application loop thread waits for the signal)
 	eae6320::Concurrency::cEvent s_whenDataForANewFrameCanBeSubmittedFromApplicationThread;
 
-	//eae6320::GameObject::cCamera* camera = new eae6320::GameObject::cCamera();
 }
 
 // Helper Declarations
@@ -98,36 +96,19 @@ void eae6320::Graphics::SubmitElapsedTime(const float i_elapsedSecondCount_syste
 	constantData_frame.g_elapsedSecondCount_simulationTime = i_elapsedSecondCount_simulationTime;	
 }
 
-//void eae6320::Graphics::SubmitCameraDataForANewFrame(eae6320::GameObject::cCamera* i_camera, eae6320::Math::cMatrix_transformation& i_transform)
-//{
-//	EAE6320_ASSERT(s_dataBeingSubmittedByApplicationThread);
-//	auto& constantData_frame = s_dataBeingSubmittedByApplicationThread->constantData_frame;
-//	constantData_frame.g_transform_worldToCamera = i_transform;
-//	constantData_frame.g_transform_cameraToProjected = i_camera->GetCameraConfigurations();
-//
-//}
-
 void eae6320::Graphics::SubmitCameraDataForANewFrame(const eae6320::Math::sVector& i_position, const eae6320::Math::cQuaternion& i_orientation, float i_fieldOfView, float i_aspectRatio, float i_nearZPlane, float i_farZPlane)
 {
 	EAE6320_ASSERT(s_dataBeingSubmittedByApplicationThread);
 	auto& constantData_frame = s_dataBeingSubmittedByApplicationThread->constantData_frame;
-	constantData_frame.g_transform_worldToCamera = i_transform;
-	constantData_frame.g_transform_cameraToProjected = i_camera->GetCameraConfigurations();
-	// The camera's world position is the translation of the inverse of the world-to-camera transform
-	// (and because a camera only has rotation and translation,
-	// CreateWorldToCameraTransform() is exactly the inverse that is needed).
-	// Calculating it from the transform that is actually used for rendering keeps the two consistent,
-	// regardless of how the game stores its camera.
-	{
-		const auto transform_cameraToWorld = Math::cMatrix_transformation::CreateWorldToCameraTransform(i_transform);
-		const auto& cameraPosition_world = transform_cameraToWorld.GetTranslation();
-		constantData_frame.g_cameraPosition_world[0] = cameraPosition_world.x;
-		constantData_frame.g_cameraPosition_world[1] = cameraPosition_world.y;
-		constantData_frame.g_cameraPosition_world[2] = cameraPosition_world.z;
-		constantData_frame.g_cameraPosition_world[3] = 1.0f;
-	}
-
-	constantData_frame.g_transform_cameraToProjected = eae6320::Math::cMatrix_transformation::CreateCameraToProjectedTransform_perspective(i_fieldOfView, i_aspectRatio, i_nearZPlane, i_farZPlane);
+	constantData_frame.g_transform_worldToCamera = Math::cMatrix_transformation::CreateWorldToCameraTransform(i_orientation, i_position);
+	constantData_frame.g_transform_cameraToProjected = Math::cMatrix_transformation::CreateCameraToProjectedTransform_perspective(
+		i_fieldOfView, i_aspectRatio, i_nearZPlane, i_farZPlane);
+	// The lighting's specular highlights need to know where the camera is in the world
+	// (the camera's position is passed in directly, so there's no need to recover it from the world-to-camera transform)
+	constantData_frame.g_cameraPosition_world[0] = i_position.x;
+	constantData_frame.g_cameraPosition_world[1] = i_position.y;
+	constantData_frame.g_cameraPosition_world[2] = i_position.z;
+	constantData_frame.g_cameraPosition_world[3] = 1.0f;
 }
 
 void eae6320::Graphics::SubmitBackgroundColorForANewFrame(const float i_redColorValue, const float i_greenColorValue, const float i_blueColorValue)

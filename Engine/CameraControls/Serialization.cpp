@@ -75,10 +75,16 @@ namespace eae6320::Serialization
 			Logging::OutputError("Failed to load binary file %s: %s", i_infile, loadFileErrorMessage.c_str());
 			return result;
 		}
-		cScopeGuard scopeGuard_OnExit([&result, &fileData]()
-			{
-				if (!result) fileData.Free();
-			});
+		// (fileData frees its memory in its destructor when this function returns,
+		// which is fine because everything that is needed is copied into the camera and new strategy objects)
+
+		// The metadata can only be read if the file is at least big enough to contain it
+		if (fileData.size < sizeof(sCameraFileMetadata))
+		{
+			Logging::OutputError("File %s is too small (%u bytes) to be a camera file", i_infile, static_cast<unsigned int>(fileData.size));
+			result = Results::InvalidFile;
+			return result;
+		}
 
 		metadata = reinterpret_cast<sCameraFileMetadata*>(fileData.data);
 
@@ -100,6 +106,8 @@ namespace eae6320::Serialization
 				i_infile, fileData.size, expectedFileSize);
 			Logging::OutputError("File %s size mismatches expected size from metadata (%d, expected %d))",
 				i_infile, fileData.size, expectedFileSize);
+			// (this used to return without setting a failure, so a truncated file was reported as loaded successfully)
+			result = Results::InvalidFile;
 			return result;
 		}
 
@@ -131,6 +139,13 @@ namespace eae6320::Serialization
 			= DeserializePositionStrategyByID(metadata->positionStrategyClassId, positionStrategyDataPtr);
 		std::unique_ptr<Camera::iOrientationStrategy> orientationStrategy
 			= DeserializeOrientationStrategyByID(metadata->orientationStrategyClassId, orientationStrategyDataPtr);
+
+		if (!positionStrategy || !orientationStrategy)
+		{
+			Logging::OutputError("File %s has an unknown position or orientation strategy", i_infile);
+			result = Results::InvalidFile;
+			return result;
+		}
 
 		o_trackingCamera.SetPositionStrategy(std::move(positionStrategy));
 		o_trackingCamera.SetOrientationStrategy(std::move(orientationStrategy));

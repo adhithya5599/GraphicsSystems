@@ -1,0 +1,51 @@
+--[[
+	This file describes all of the lighting in One Shot's scene
+
+	It is built by Tools/LightingBuilder into a binary file (data/Lighting/scene.lighting)
+	that the Graphics system loads at startup; the game code never touches it.
+	Edit a value, build BuildOneShotGameAssets (or the whole solution), and run the game to see the change.
+
+	Coordinates are in the engine's world space:
+		* +x is right, +y is up, and the arrow flies down -z
+		* The bow is at the origin, the ground is at y = -2.67, and the target is at ( -2.5, 0, -35 )
+		  (see OneShotGame/GameplaySettings.h)
+
+	Every section and every value is optional: anything that is left out uses the default in Engine/Lighting/sLightingData.h.
+	Colors are { r, g, b } with each channel between 0 and 1; brightness is controlled separately by "intensity".
+	The sky isn't affected by any of this (it uses the unlit shader).
+]]
+
+return
+{
+	-- Ambient light stands in for light bouncing around the scene,
+	-- blending from skyColor on surfaces facing up to groundColor on surfaces facing down
+	ambient =
+	{
+		skyColor = { 0.60, 0.70, 0.85 },	-- Daylight blue from an open sky
+		groundColor = { 0.35, 0.30, 0.22 },	-- Warm light bounced off the ground
+		intensity = 0.35,
+	},
+
+	-- The sun: high and from behind the archer's right shoulder,
+	-- so the faces of the obstacles and the target that the arrow flies toward are lit
+	directional =
+	{
+		direction = { -0.4, -1.0, -0.5 },
+		color = { 1.0, 0.95, 0.85 },	-- Slightly warm white
+		intensity = 0.8,
+	},
+
+	specular =
+	{
+		intensity = 0.2,	-- Mostly matte: wood, stone, and painted targets
+		shininess = 32,
+	},
+
+	-- At most 4 (Lighting::MaxPointLightCount).
+	-- Point lights fade out to exactly zero at their range, so a light far from the camera costs nothing visually.
+	pointLights =
+	{
+		-- A warm light just in front of the target so that it stands out at the end of the course
+		{ position = { -2.5, 1.5, -32.5 }, color = { 1.00, 0.80, 0.45 }, intensity = 6.0, range = 7.0 },
+	},
+}

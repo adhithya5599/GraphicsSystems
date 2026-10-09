@@ -98,12 +98,13 @@ void eae6320::Physics::FindPolygonsContactPoints(const std::vector<Math::sVector
             Math::sVector2 cp;
             PointSegmentDistance(p, va, vb, distSqr, cp);
 
-            // 当发现第二个接触点和边的距离与之前发现的最近接触点和边的距离几乎一样，那么代表两个body各自的碰撞边几乎平行，因此算作有两个接触点
+            // If this point is (almost) as close to the edge as the closest contact found so far,
+            // the two bodies' colliding edges are (almost) parallel, and so this counts as a second contact point
             if (Math::NearlyEqual(distSqr, minDistSqr))
             {
-                // 当两个body的同一条边的端点几乎重叠时，这两条边的这一个端点会被计算两次，加上这两条边的另外两个端点中的其中一个也会被计算
-                // 导致三个端点中的其中一个的信息会被覆盖掉，如果覆盖的是非重叠的端点，就会导致计算错误
-                // 因此，这种情况下，忽略其中一个重叠的端点
+                // When the two bodies' edges share (almost) the same endpoint,
+                // that endpoint would be counted twice and could overwrite the other, real, contact point,
+                // so a point that matches the first contact is ignored
                 if (!Math::NearlyEqual(cp, o_contact1))
                 {
                     o_contact2 = cp;
@@ -177,7 +178,8 @@ bool eae6320::Physics::Collide(eae6320::Physics::PhysicsBody2D* bodyA, PhysicsBo
         }
         else if (shapeTypeB == EShapeType::Circle)
         {
-            // 这里将B作为参照物，计算的normal是B将A推开的方向，但由于Collide函数输出的应当是A推开B的方向，因此将normal取反
+            // B is the reference here, so the calculated normal is the direction that B pushes A,
+            // but Collide() outputs the direction that A pushes B, so the normal is negated
             bool result = Physics::IntersectCirclePolygon(
                 bodyB->position, bodyB->Radius,
                 bodyA->position, bodyA->GetTransformedVertices2D(),
@@ -223,7 +225,8 @@ bool eae6320::Physics::Collide(PhysicsBody2D* bodyA, PhysicsBody2D* bodyB)
         }
         else if (shapeTypeB == EShapeType::Circle)
         {
-            // 这里将B作为参照物，计算的normal是B将A推开的方向，但由于Collide函数输出的应当是A推开B的方向，因此将normal取反
+            // B is the reference here, so the calculated normal is the direction that B pushes A,
+            // but Collide() outputs the direction that A pushes B, so the normal is negated
             bool result = Physics::IntersectCirclePolygon(
                 bodyB->position, bodyB->Radius,
                 bodyA->position, bodyA->GetTransformedVertices2D(),
@@ -272,7 +275,7 @@ bool eae6320::Physics::IntersectPolygons(const Math::sVector2& i_polygonCenterA,
     Math::sVector2& o_normal, float& o_depth)
 {
     o_normal = Math::sVector2::Zero();
-    // 记录可以将碰撞盒移出交集区域的最小值
+    // The smallest overlap found so far (the depth needed to push the shapes apart)
     o_depth = FLT_MAX;
     for (unsigned int i = 0; i < i_verticesA.size(); i++)
     {
@@ -283,7 +286,8 @@ bool eae6320::Physics::IntersectPolygons(const Math::sVector2& i_polygonCenterA,
         Math::sVector2 axis = Math::sVector2(-edge.y, edge.x);
         axis = axis.GetNormalized();
 
-        // 获取在分离轴上的投影，然后获取投影结果的最小值和最大值，进行比较，判断是否在所有分离轴上都重合
+        // Project both shapes onto the separating axis and compare the ranges:
+        // the shapes only intersect if their projections overlap on every axis
         float minA, maxA, minB, maxB;
         ProjectVertices(i_verticesA, axis, minA, maxA);
         ProjectVertices(i_verticesB, axis, minB, maxB);
@@ -311,7 +315,8 @@ bool eae6320::Physics::IntersectPolygons(const Math::sVector2& i_polygonCenterA,
         Math::sVector2 axis = Math::sVector2(-edge.y, edge.x);
         axis = axis.GetNormalized();
 
-        // 获取在分离轴上的投影，然后获取投影结果的最小值和最大值，进行比较，判断是否在所有分离轴上都重合
+        // Project both shapes onto the separating axis and compare the ranges:
+        // the shapes only intersect if their projections overlap on every axis
         float minA, maxA, minB, maxB;
         ProjectVertices(i_verticesA, axis, minA, maxA);
         ProjectVertices(i_verticesB, axis, minB, maxB);
@@ -343,7 +348,7 @@ bool eae6320::Physics::IntersectPolygons(const Math::sVector2& i_polygonCenterA,
 bool eae6320::Physics::IntersectCirclePolygon(const Math::sVector2& i_circleCenter, const float& i_circleRadius, const Math::sVector2& i_polygonCenter, const std::vector<Math::sVector2>& i_vertices, Math::sVector2& o_normal, float& o_depth)
 {
     o_normal = Math::sVector2::Zero();
-    // 记录可以将碰撞盒移出交集区域的最小值
+    // The smallest overlap found so far (the depth needed to push the shapes apart)
     o_depth = FLT_MAX;
     Math::sVector2 axis = Math::sVector2::Zero();
     float axisdepth = 0;
@@ -357,7 +362,8 @@ bool eae6320::Physics::IntersectCirclePolygon(const Math::sVector2& i_circleCent
         axis = Math::sVector2(-edge.y, edge.x);
         axis = axis.GetNormalized();
 
-        // 获取在分离轴上的投影，然后获取投影结果的最小值和最大值，进行比较，判断是否在所有分离轴上都重合
+        // Project both shapes onto the separating axis and compare the ranges:
+        // the shapes only intersect if their projections overlap on every axis
         ProjectVertices(i_vertices, axis, minA, maxA);
         ProjectCircle(i_circleCenter, i_circleRadius, axis, minB, maxB);
 
@@ -416,12 +422,12 @@ void eae6320::Physics::PointSegmentDistance(const Math::sVector2& i_p, const Mat
     float abLenSqr = ab.GetLengthSquared();
     float d = proj / abLenSqr;
 
-    // 如果d<=0，说明ap与ab边垂直，或者超出了ab边的边界，并且靠近a，因为向量起点为a，所以距离p点最近的ab上一点就是a
+    // If d <= 0, p projects onto the line before a, so the closest point on the segment ab is a
     if (d <= 0)
     {
         o_cp = i_a;
     }
-    // 与上一种情况相反
+    // The opposite case: p projects past b, so the closest point is b
     else if (d >= 1)
     {
         o_cp = i_b;
@@ -438,7 +444,7 @@ void ProjectVertices(const std::vector<eae6320::Math::sVector2>& i_vertices, con
 {
     using namespace eae6320::Math;
     o_min = FLT_MAX;
-    o_max = FLT_MIN;
+    o_max = -FLT_MAX;
 
     for (unsigned int i = 0; i < i_vertices.size(); i++)
     {

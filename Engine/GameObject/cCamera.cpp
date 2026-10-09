@@ -1,59 +1,26 @@
+// Includes
+//=========
+
 #include "cCamera.h"
 
-//#include <Engine/Physics/sRigidBodyState.h>
-#include <Engine/Math/cMatrix_transformation.h>
-#include <Engine/Math/Functions.h>
+#include <Engine/Asserts/Asserts.h>
+#include <Engine/Graphics/Graphics.h>
 
-eae6320::GameObject::cCamera::cCamera()
+// Interface
+//==========
+
+void eae6320::GameObject::cCamera::SetClippingPlanes( const float i_nearPlaneDistance, const float i_farPlaneDistance )
 {
-	//m_rigidBodyState = new eae6320::Physics::sRigidBodyState();
-	//m_transform = new eae6320::Math::cMatrix_transformation();
-	//m_configurations = new eae6320::Math::cMatrix_transformation();
-	//m_rigidBodyState->position = Math::sVector( 0.f, 0.f, 10.f );
-	//*m_transform = Math::cMatrix_transformation::CreateWorldToCameraTransform(m_rigidBodyState->orientation, m_rigidBodyState->position);
-	//*m_configurations = Math::cMatrix_transformation::CreateCameraToProjectedTransform_perspective(Math::ConvertDegreesToRadians(45.f), 1.f, 0.1f, 50.f);
-	//m_rigidBodyState->position = m_transform->GetTranslation();
+	EAE6320_ASSERTF( ( i_nearPlaneDistance > 0.0f ) && ( i_farPlaneDistance > i_nearPlaneDistance ),
+		"The near plane must be in front of the camera and closer than the far plane" );
+	m_nearPlaneDistance = i_nearPlaneDistance;
+	m_farPlaneDistance = i_farPlaneDistance;
 }
 
-const eae6320::Math::cMatrix_transformation eae6320::GameObject::cCamera::GetCameraTransform()
+void eae6320::GameObject::cCamera::SubmitToBeRendered( const float i_elapsedSecondCount_sinceLastSimulationUpdate, const float i_aspectRatio ) const
 {
-	return *m_transform;
-}
-
-//const eae6320::Math::sVector eae6320::GameObject::cCamera::GetCameraPosition() const
-//{
-//	return m_rigidBodyState->position;
-//}
-//
-//const eae6320::Math::cQuaternion eae6320::GameObject::cCamera::GetCameraRotation() const
-//{
-//	return m_rigidBodyState->orientation;
-//}
-
-const eae6320::Math::cMatrix_transformation eae6320::GameObject::cCamera::GetCameraConfigurations()
-{
-	return *m_configurations;
-}
-
-//eae6320::Physics::sRigidBodyState*& eae6320::GameObject::cCamera::GetRigidBodyState()
-//{
-//	return m_rigidBodyState;
-//}
-
-eae6320::GameObject::cCamera::~cCamera()
-{
-	//if (m_rigidBodyState)
-	//{
-	//	delete m_rigidBodyState;
-	//}
-
-	if (m_transform)
-	{
-		delete m_transform;
-	}
-
-	if (m_configurations)
-	{
-		delete m_configurations;
-	}
+	Graphics::SubmitCameraDataForANewFrame(
+		m_rigidBodyState.PredictFuturePosition( i_elapsedSecondCount_sinceLastSimulationUpdate ),
+		m_rigidBodyState.PredictFutureOrientation( i_elapsedSecondCount_sinceLastSimulationUpdate ),
+		m_verticalFieldOfView_inRadians, i_aspectRatio, m_nearPlaneDistance, m_farPlaneDistance );
 }

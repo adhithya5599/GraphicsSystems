@@ -1,5 +1,7 @@
 #include "cTrackingCamera.h"
+#include <Engine/Asserts/Asserts.h>
 #include <Engine/Graphics/Graphics.h>
+#include <Engine/Logging/Logging.h>
 #include <Engine/Math/sVector.h>
 #include <Engine/Math/cQuaternion.h>
 #include "Position/iPositionStrategy.h"
@@ -7,13 +9,6 @@
 
 namespace eae6320::Camera
 {
-	struct sSerializedTrackingCamera
-	{
-		Math::sVector2D fieldOfViewRadians;
-		float zNearPlane;
-		float zFarPlane;
-	};
-
 	// Getters/Setters
 	//-----------
 
@@ -129,6 +124,14 @@ namespace eae6320::Camera
 
 	void cTrackingCamera::Update(float i_deltaSeconds)
 	{
+		// A camera can't be updated until it has been loaded (which gives it its strategies)
+		// and has been told what to track
+		if (!m_positionStrategy || !m_orientationStrategy || !m_targetPosition || !m_targetOrientation)
+		{
+			EAE6320_ASSERTF(false, "A tracking camera needs position/orientation strategies and a target before it can be updated");
+			return;
+		}
+
 		Math::sVector newPosition = m_positionStrategy->CalculatePosition(
 			i_deltaSeconds, *this, GetPosition(), GetOrientation(), *m_targetPosition, *m_targetOrientation);
 		Math::cQuaternion newOrientation = m_orientationStrategy->CalculateOrientation(

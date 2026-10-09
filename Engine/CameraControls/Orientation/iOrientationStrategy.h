@@ -19,6 +19,12 @@ namespace eae6320::Camera
 	class iOrientationStrategy
 	{
 	public:
+		// Strategies are owned (and deleted) through a std::unique_ptr<iOrientationStrategy>,
+		// so the destructor must be virtual:
+		// otherwise deleting a derived strategy through the interface pointer is undefined behavior
+		// (in practice the derived class's members, like a composer's child strategies, would never be destroyed)
+		virtual ~iOrientationStrategy() = default;
+
 		virtual Math::cQuaternion CalculateOrientation(
 			float i_deltaSeconds,
 			const cTrackingCamera& i_trackingCamera,

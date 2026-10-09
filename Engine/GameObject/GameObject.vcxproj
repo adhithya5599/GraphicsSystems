@@ -154,6 +154,20 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Graphics\Graphics.vcxproj">
+      <Project>{fca8af7f-684c-488f-a207-d9d751d3be6e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Math\Math.vcxproj">
+      <Project>{999c3d5f-7f79-4bd7-ae21-92eeed0c5962}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Physics\Physics.vcxproj">
+      <Project>{30e6bb9f-138d-4b44-9733-869263f7bad5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Texture\Texture.vcxproj">
+      <Project>{fb8e9a70-6d6e-43c6-b6bc-155bbffd38c7}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

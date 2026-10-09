@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Engine/Math/sVector2.h>
+
+#include <cfloat>
 #include <vector>
 
 namespace eae6320

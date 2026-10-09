@@ -1,17 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="Collision3D.cpp" />
     <ClCompile Include="Collisions.cpp" />
     <ClCompile Include="cPhysicsBody2D.cpp" />
     <ClCompile Include="cPhysicsWorld.cpp" />
+    <ClCompile Include="sRigidBodyState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AABB.h" />
+    <ClInclude Include="Collision3D.h" />
     <ClInclude Include="Collisions.h" />
     <ClInclude Include="cPhysicsBody2D.h" />
     <ClInclude Include="cPhysicsWorld.h" />
-    <ClInclude Include="cRigidBody2D.h" />
     <ClInclude Include="PhysicsManifold.h" />
     <ClInclude Include="PhysicsUtil.h" />
+    <ClInclude Include="sRigidBodyState.h" />
   </ItemGroup>
 </Project>

@@ -28,13 +28,26 @@
     <ResourceCompile Include="Resource Files\OneShotGame.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cArrow.h" />
+    <ClInclude Include="cKeyPressTracker.h" />
+    <ClInclude Include="cObstacleCourse.h" />
+    <ClInclude Include="cShotCameraRig.h" />
     <ClInclude Include="cOneShotGame.h" />
+    <ClInclude Include="GameplaySettings.h" />
+    <ClInclude Include="OneShotLock.h" />
+    <ClInclude Include="sGameAssets.h" />
     <ClInclude Include="Resource Files\Resource.h" />
     <ClInclude Include="Resource Files\targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cArrow.cpp" />
+    <ClCompile Include="cKeyPressTracker.cpp" />
+    <ClCompile Include="cObstacleCourse.cpp" />
+    <ClCompile Include="cShotCameraRig.cpp" />
     <ClCompile Include="cOneShotGame.cpp" />
     <ClCompile Include="EntryPoint.cpp" />
+    <ClCompile Include="OneShotLock.cpp" />
+    <ClCompile Include="sGameAssets.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Engine\Application\Application.vcxproj">
@@ -45,6 +58,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\Engine\CameraControls\CameraControls.vcxproj">
       <Project>{b1bc2137-5872-43ad-9c51-529cf736cc29}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Engine\GameObject\GameObject.vcxproj">
+      <Project>{d588db20-0924-4b74-bea2-8e2e3bd06d8e}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Engine\Math\Math.vcxproj">
       <Project>{999c3d5f-7f79-4bd7-ae21-92eeed0c5962}</Project>

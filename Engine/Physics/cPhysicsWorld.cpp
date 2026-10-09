@@ -53,7 +53,9 @@ void eae6320::Physics::cPhysicsWorld::Step(float i_deltatime, int i_iterations)
 void eae6320::Physics::cPhysicsWorld::BroadPhase()
 {
 	// Collision Step
-	for (unsigned int i = 0; i < m_bodyList.size() - 1; i++)
+	// (size() is unsigned, so "size() - 1" would wrap around to a huge number when there are no bodies;
+	// "i + 1 < size()" checks the same thing without subtracting)
+	for (unsigned int i = 0; i + 1 < m_bodyList.size(); i++)
 	{
 		Physics::PhysicsBody2D* bodyA = m_bodyList[i].get();
 		Physics::AABB bodyA_AABB = bodyA->GetAABB();
@@ -68,7 +70,7 @@ void eae6320::Physics::cPhysicsWorld::BroadPhase()
 				continue;
 			}
 
-			// 使用AABB粗略判断两个物体是否碰撞，减少计算量
+			// The AABB test is a cheap, rough check that skips the expensive exact test for most pairs
 			if (!IntersectAABBs(bodyA_AABB, bodyB_AABB))
 			{
 				continue;
@@ -123,19 +125,19 @@ void eae6320::Physics::cPhysicsWorld::StepBodies(float time, int totalIterations
 	}
 }
 
-// 使用冲量公式，计算碰撞后，两个物体速度的变化
+// Uses the impulse equation to calculate how the two bodies' velocities change because of the collision
 void eae6320::Physics::cPhysicsWorld::ResolveCollisionBasic(const PhysicsManifold& i_manifold)
 {
 	Math::sVector2 relativeVelocity = i_manifold.BodyB->velocity - i_manifold.BodyA->velocity;
 
-	// 如果两个物体的相对速度在法线的投影上与法线同向，则代表不需要再应用反弹
+	// If the bodies are already moving apart along the normal then there is nothing to bounce
 	if (Math::Dot(relativeVelocity, i_manifold.Normal) > 0.f)
 	{
 		return;
 	}
 
 	float e = std::min(i_manifold.BodyA->Restitution, i_manifold.BodyB->Restitution);
-	// 根据弹性，计算反弹力的大小
+	// The size of the bounce depends on the restitution ("bounciness")
 	float j = -(1.f + e) * Math::Dot(relativeVelocity, i_manifold.Normal);
 	j /= (i_manifold.BodyA->InvMass) + (i_manifold.BodyB->InvMass);
 
@@ -212,8 +214,8 @@ void eae6320::Physics::cPhysicsWorld::ResolveCollisionWithRotation(const Physics
 		Math::sVector2 impulse = impulseList[i];
 
 		bodyA->velocity += -impulse * bodyA->InvMass;
-		// 使用叉积来计算impulse方向，对角速度影响的大小，因为当impulse完全沿着r方向或相反时（接触点与物体重心形成的向量），不需要改变角速度，
-		// 在叉积中，如果两个向量越接近垂直，结果越大
+		// The cross product measures how much the impulse changes the angular velocity: an impulse straight along r
+		// (from the center of mass to the contact point) doesn't rotate the body, and the more perpendicular they are the more it does
 		bodyA->angularVelocity += -Math::Cross(raList[i], impulse) * bodyA->InvInertia;
 		bodyB->velocity += impulse * bodyB->InvMass;
 		bodyB->angularVelocity += Math::Cross(rbList[i], impulse) * bodyB->InvInertia;
@@ -231,7 +233,7 @@ void eae6320::Physics::cPhysicsWorld::ResolveCollisionWithRotationAndFriction(co
 
 	float e = std::min(bodyA->Restitution, bodyB->Restitution);
 
-	//可以使用材质摩擦力表查找两个表面之间的摩擦力，这里使用平均值代替
+	// A table of per-material-pair friction values could be used here; the average of the two bodies is used instead
 	float sf = (bodyA->StaticFriction + bodyB->StaticFriction) / 2.f;
 	float df = (bodyA->DynamicFriction + bodyB->DynamicFriction) / 2.f;
 
@@ -292,8 +294,8 @@ void eae6320::Physics::cPhysicsWorld::ResolveCollisionWithRotationAndFriction(co
 		Math::sVector2 impulse = impulseList[i];
 
 		bodyA->velocity += -impulse * bodyA->InvMass;
-		// 使用叉积来计算impulse方向，对角速度影响的大小，因为当impulse完全沿着r方向或相反时（接触点与物体重心形成的向量），不需要改变角速度，
-		// 在叉积中，如果两个向量越接近垂直，结果越大
+		// The cross product measures how much the impulse changes the angular velocity: an impulse straight along r
+		// (from the center of mass to the contact point) doesn't rotate the body, and the more perpendicular they are the more it does
 		bodyA->angularVelocity += -Math::Cross(raList[i], impulse) * bodyA->InvInertia * 0.5f;
 		bodyB->velocity += impulse * bodyB->InvMass;
 		bodyB->angularVelocity += Math::Cross(rbList[i], impulse) * bodyB->InvInertia * 0.5f;
@@ -348,8 +350,8 @@ void eae6320::Physics::cPhysicsWorld::ResolveCollisionWithRotationAndFriction(co
 		else
 		{
 			float magnitude = std::abs(jList[i]) * df;
-			float direction = (jt > 0.f) ? 1.f : -1.f;  // 添加这行
-			frictionImpulse = direction * magnitude * tangent;  // 修改这里
+			float direction = (jt > 0.f) ? 1.f : -1.f;
+			frictionImpulse = direction * magnitude * tangent;
 		}
 		frictionImpulseList[i] = frictionImpulse;
 	}
@@ -366,11 +368,26 @@ void eae6320::Physics::cPhysicsWorld::ResolveCollisionWithRotationAndFriction(co
 }
 
 void eae6320::Physics::cPhysicsWorld::SeparateBodies(PhysicsBody2D* i_bodyA, PhysicsBody2D* i_bodyB, Math::sVector2 i_mtv)
-{					// 如果body是static的，那么Collide不能够移动该body
-	if (!i_bodyA->bIsStatic && i_mtv.GetLength() > 0.001f)
+{
+	// A static body can't be moved, so when one of the bodies is static the other one must move the whole distance
+	// (moving it only half way would leave the bodies still overlapping, and dynamic bodies would sink into static ones)
+	if (i_mtv.GetLength() <= 0.001f)
+	{
+		return;
+	}
+	if (i_bodyA->bIsStatic)
+	{
+		i_bodyB->Move(i_mtv);
+	}
+	else if (i_bodyB->bIsStatic)
+	{
+		i_bodyA->Move(-i_mtv);
+	}
+	else
+	{
 		i_bodyA->Move(-i_mtv / 2.f);
-	if (!i_bodyB->bIsStatic && i_mtv.GetLength() > 0.001f)
 		i_bodyB->Move(i_mtv / 2.f);
+	}
 }
 
 bool eae6320::Physics::cPhysicsWorld::OverlapBox(const Math::sVector2& i_boxPosition, float i_boxWidth, float i_boxHeight, std::vector<PhysicsBody2D*>& o_result)

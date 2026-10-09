@@ -1,5 +1,17 @@
 /*
-	This class is your specific game
+	One Shot: launch an arrow, steer it past the moving obstacles, and hit the target.
+	You only get one shot.
+
+	This class is the glue between the engine and the game:
+	it owns the game's pieces and decides what happens when (the game's states),
+	while each piece handles its own details:
+		* sGameAssets loads every mesh, effect, and texture once
+		* cArrow flies and steers the arrow
+		* cObstacleCourse moves the obstacles and checks whether the arrow touched one
+		* cShotCameraRig follows the action and blends between the two cameras
+		* cKeyPressTracker turns held keys into single presses
+		* OneShotLock remembers that the shot has been taken
+	Every number that tunes the game is in GameplaySettings.h.
 */
 
 #ifndef EAE6320_CONESHOTGAME_H
@@ -8,13 +20,15 @@
 // Includes
 //=========
 
+#include "cArrow.h"
+#include "cKeyPressTracker.h"
+#include "cObstacleCourse.h"
+#include "cShotCameraRig.h"
+#include "sGameAssets.h"
 
 #include <Engine/Application/iApplication.h>
-#include <Engine/Results/Results.h>
-#include <Engine/Physics/cPhysicsWorld.h>
 #include <Engine/GameObject/cGameObject.h>
-#include <vector>
-#include <memory>
+#include <Engine/Results/Results.h>
 
 #if defined( EAE6320_PLATFORM_WINDOWS )
 	#include "Resource Files/Resource.h"
@@ -25,59 +39,15 @@
 
 namespace eae6320
 {
-
 	class cOneShotGame final : public Application::iApplication
 	{
 		// Inherited Implementation
 		//=========================
-		void SubmitDataToBeRendered(const float i_elapsedSecondCount_systemTime, const float i_elapsedSecondCount_sinceLastSimulationUpdate) final;
-		void UpdateSimulationBasedOnInput() final;
-		void UpdateSimulationBasedOnTime(const float i_elapsedSecondCount_sinceLastUpdate) final;
+
 	private:
 
 		// Configuration
 		//--------------
-		
-		//Subsystem
-		std::unique_ptr<Physics::cPhysicsWorld> m_PhysicsWorld;
-		float m_ProjectileZ = 0.0f;
-		float m_ProjectileZVelocity = 0.0f;
-		float m_goalZPosition = -35.0f;
-		float m_obstacleTime = 0.0f;
-
-		struct sObstacle
-		{
-			std::shared_ptr<GameObject::cMyGameObject> object;
-			float zPosition;
-
-			//Motion parameters
-			float amplitude;
-			float frequency;
-			float baseZPosition;
-			
-			bool moveX = false;
-			bool moveY = false;
-			bool moveZ = false;
-
-			eae6320::Math::sVector2 initialPosition;
-			eae6320::Math::sVector2 direction;
-
-		};
-
-		enum class eCameraMode
-		{
-			FirstPerson,
-			ThirdPerson2D
-		};
-
-		eCameraMode m_CameraMode = eCameraMode::ThirdPerson2D;
-
-		float m_ProjectileTipOffset = 0.9f;
-		eae6320::Math::sVector m_FirstPersonAnchor;
-
-		std::vector<sObstacle> m_Obstacles;
-		bool m_isGamePaused = false;
-		bool m_isTimeSlowed = false;
 
 #if defined( EAE6320_PLATFORM_WINDOWS )
 		// The main window's name will be displayed as its caption (the text that is displayed in the title bar).
@@ -119,21 +89,80 @@ namespace eae6320
 		// Run
 		//----
 
+		// Every frame: keys that toggle things or start things (pause, slow motion, launch, switch camera)
 		void UpdateBasedOnInput() final;
+		// Every simulation update: steering, and acting on what was requested in UpdateBasedOnInput()
+		void UpdateSimulationBasedOnInput() final;
+		void UpdateSimulationBasedOnTime( const float i_elapsedSecondCount_sinceLastUpdate ) final;
+		void SubmitDataToBeRendered( const float i_elapsedSecondCount_systemTime, const float i_elapsedSecondCount_sinceLastSimulationUpdate ) final;
 
 		// Initialize / Clean Up
 		//----------------------
 
 		cResult Initialize() final;
 		cResult CleanUp() final;
-		cResult CreateFixedObstacles();
-		bool CheckProjectileObstacleCollision();
-		bool CheckProjectileGoalCollision();
 
-		bool m_isGameEnded = false;
-		bool IsGameEndedBefore();
-		void MarkGameAsEnded();
+		// Data
+		//=====
 
+	private:
+
+		enum class eGameState
+		{
+			// The game won't start because this computer has already taken its shot
+			AlreadyPlayed,
+			// Waiting for the player to launch the arrow
+			Aiming,
+			// The arrow is in the air and the player is steering it
+			Flying,
+			// The arrow hit something (or missed); the result is shown for a moment and then the game closes
+			ShowingResult,
+		};
+		enum class eShotResult
+		{
+			HitTarget,
+			HitObstacle,
+			Missed,
+		};
+
+		eGameState m_gameState = eGameState::Aiming;
+		eShotResult m_shotResult = eShotResult::Missed;
+		// How long the result has been shown for
+		float m_resultSecondCount = 0.0f;
+
+		OneShot::sGameAssets m_assets;
+		OneShot::cArrow m_arrow;
+		OneShot::cObstacleCourse m_obstacleCourse;
+		OneShot::cShotCameraRig m_cameraRig;
+		GameObject::cGameObject m_bow;
+		GameObject::cGameObject m_ground;
+		GameObject::cGameObject m_target;
+		GameObject::cGameObject m_skybox;
+
+		// Input
+		//------
+
+		OneShot::cKeyPressTracker m_keyPresses;
+		// Key presses are noticed every frame,
+		// but anything that changes the simulation waits for the next simulation update
+		// (see UpdateSimulationBasedOnInput() in iApplication.cpp for why)
+		bool m_isLaunchRequested = false;
+		bool m_isViewSwitchRequested = false;
+		bool m_isPaused = false;
+		bool m_isSlowMotionOn = false;
+		// Exiting doesn't stop the application loop immediately,
+		// so this makes sure that the game only tries to exit (and shows its closing message) once
+		bool m_isExiting = false;
+
+		// Implementation
+		//===============
+
+		void LaunchArrow();
+		void CheckForShotResult();
+		void EndShot( const eShotResult i_result );
+		// Pausing and slow motion both just change how fast simulation time passes
+		void UpdateSimulationRate();
+		void ExitGame();
 	};
 }
 
@@ -158,4 +187,4 @@ namespace eae6320
 	}
 }
 
-#endif	// EAE6320_COneShotGAME_H
+#endif	// EAE6320_CONESHOTGAME_H

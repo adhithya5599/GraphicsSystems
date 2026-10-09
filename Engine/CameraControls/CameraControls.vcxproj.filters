@@ -39,6 +39,9 @@
     <ClInclude Include="Orientation\iOrientationStrategy.h">
       <Filter>Header Files\Orientation</Filter>
     </ClInclude>
+    <ClInclude Include="cCameraTransition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="cTrackingCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -70,6 +73,9 @@
     </ClCompile>
     <ClCompile Include="Orientation\cOrientationLockToTarget.cpp">
       <Filter>Source Files\Orientation</Filter>
+    </ClCompile>
+    <ClCompile Include="cCameraTransition.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cTrackingCamera.cpp">
       <Filter>Source Files</Filter>

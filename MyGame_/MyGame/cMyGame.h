@@ -3,12 +3,14 @@
 */
 
 #ifndef EAE6320_CMYGAME_H
-#define EAE6320_CMyGAME_H
+#define EAE6320_CMYGAME_H
 
 // Includes
 //=========
 
 #include <Engine/Application/iApplication.h>
+#include <Engine/GameObject/cCamera.h>
+#include <Engine/GameObject/cGameObject.h>
 #include <Engine/Results/Results.h>
 
 #if defined( EAE6320_PLATFORM_WINDOWS )
@@ -80,6 +82,28 @@ namespace eae6320
 		cResult Initialize() final;
 		cResult CleanUp() final;
 
+		// Data
+		//=====
+
+		// The assets are loaded once and then shared by the game objects
+		// (each game object adds its own reference, so this game releases its references in CleanUp())
+		Graphics::cEffect* m_effect = nullptr;
+		Graphics::cMesh* m_suzanneMesh = nullptr;
+		Graphics::cMesh* m_floorMesh = nullptr;
+		Texture::cTexture* m_whiteTexture = nullptr;
+		Texture::cTexture* m_groundTexture = nullptr;
+		Texture::cTexture* m_waterTexture = nullptr;
+		Texture::cTexture* m_grassTexture = nullptr;
+
+		// The monkey is the "player" that the arrow keys move;
+		// moving it around the fixed lights is an easy way to see the lighting change
+		GameObject::cGameObject m_suzanne;
+		GameObject::cGameObject m_floor;
+		GameObject::cCamera m_camera;
+
+		float m_aspectRatio = 1.0f;
+		// Holding Backspace swaps the textures
+		bool m_areTexturesSwapped = false;
 	};
 }
 

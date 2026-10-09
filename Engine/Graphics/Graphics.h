@@ -29,11 +29,6 @@ namespace eae6320
 		struct sVector;
 	}
 
-	namespace GameObject
-	{
-		class cCamera;
-	}
-
 	namespace Texture
 	{
 		class cTexture;
@@ -55,10 +50,9 @@ namespace eae6320
 		// of how the application submits the total elapsed times
 		// for the frame currently being submitted
 		void SubmitElapsedTime( const float i_elapsedSecondCount_systemTime, const float i_elapsedSecondCount_simulationTime );
-		//Submit the Camera data
-		// the values are the camera object, the vertical field of view, focal length, near plane and far plane
-		//void SubmitCameraDataForANewFrame(cCamera* i_camera, const float i_verticalFieldOfView, const float i_focalLength, const float i_nearPlaneDistance, const float i_farPlaneDistance);
-		//void SubmitCameraDataForANewFrame(GameObject::cCamera* i_camera, eae6320::Math::cMatrix_transformation& i_transform);
+		// Submits the camera for the frame:
+		// where it is, which way it is facing, its vertical field of view (in radians),
+		// the width/height aspect ratio of the screen, and the distances to the near and far clipping planes
 		void SubmitCameraDataForANewFrame(const Math::sVector& i_position, const Math::cQuaternion& i_orientation, float i_fieldOfView, float i_aspectRatio, float i_nearZPlane, float i_farZPlane);
 
 		//Submit the background color data for the new frame
