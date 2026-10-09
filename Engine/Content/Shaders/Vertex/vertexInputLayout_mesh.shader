@@ -21,6 +21,9 @@ void main(
 	in const float3 i_position : POSITION,
 	in const float4 i_color : COLOR,
 	in const float2 i_texture : TEXCOORD,
+	// (i_normal isn't used, but every declared input is part of the compiled shader's input signature,
+	// and that signature is what CreateInputLayout() validates the C++ layout against)
+	in const float3 i_normal : NORMAL,
 
 	// Output
 	//=======
@@ -51,6 +54,7 @@ void main(
 
 layout( location = 0 ) in vec3 i_position;
 layout( location = 1 ) in vec4 i_color;
+layout( location = 3 ) in vec3 i_normal;
 layout( location = 1 ) out vec4 o_color;
 void main()
 // Input

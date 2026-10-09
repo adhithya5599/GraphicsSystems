@@ -51,7 +51,7 @@ eae6320::cResult eae6320::Graphics::cVertexFormat::Initialize( const eVertexType
 		{
 		case eVertexType::Mesh:
 			{
-				constexpr unsigned int vertexElementCount = 3;
+				constexpr unsigned int vertexElementCount = 4;
 				D3D11_INPUT_ELEMENT_DESC layoutDescription[vertexElementCount] = {};
 				{
 					// Slot 0
@@ -87,7 +87,7 @@ eae6320::cResult eae6320::Graphics::cVertexFormat::Initialize( const eVertexType
 
 					//Slot 2
 					//Texture
-					// Offset = 24
+					// Offset = 16
 					{
 						auto& texCoordElement = layoutDescription[2];
 						texCoordElement.SemanticName = "TEXCOORD";
@@ -97,6 +97,20 @@ eae6320::cResult eae6320::Graphics::cVertexFormat::Initialize( const eVertexType
 						texCoordElement.AlignedByteOffset = offsetof( VertexFormats::sVertex_mesh, u );
 						texCoordElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 						texCoordElement.InstanceDataStepRate = 0;
+					}
+
+					// NORMAL
+					// 3 floats == 12 bytes
+					// Offset = 24
+					{
+						auto& normalElement = layoutDescription[3];
+						normalElement.SemanticName = "NORMAL";
+						normalElement.SemanticIndex = 0;
+						normalElement.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+						normalElement.InputSlot = 0;
+						normalElement.AlignedByteOffset = offsetof( VertexFormats::sVertex_mesh, nx );
+						normalElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+						normalElement.InstanceDataStepRate = 0;
 					}
 
 				}

@@ -38,10 +38,13 @@ namespace eae6320
 			Physics::sRigidBodyState* GetRigidBodyState();
 
 		private:
-			Graphics::cMesh* m_Mesh;
-			Graphics::cEffect* m_Effect;
+			// These must start as nullptr:
+			// the destructor releases them if they aren't null,
+			// so an uninitialized (garbage) pointer would be "released" if a mesh or effect was never loaded
+			Graphics::cMesh* m_Mesh = nullptr;
+			Graphics::cEffect* m_Effect = nullptr;
 
-			Physics::sRigidBodyState* m_RigidBodyState;
+			Physics::sRigidBodyState* m_RigidBodyState = nullptr;
 		};
 	}
 }

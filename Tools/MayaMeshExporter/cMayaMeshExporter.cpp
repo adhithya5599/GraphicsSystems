@@ -801,8 +801,11 @@ namespace
 					"	{" "\n";
 				for (size_t i = 0; i < i_vertexArray.size(); i++)
 				{
+					// The normal is converted the same way as the position (NORMAL -> nx, ny, -nz above)
+					// so that it matches the lighting done in the engine's coordinate system
 					fout << "		{ name = \"vertex Position " << i + 1 << " \", x = " << i_vertexArray[i].vertex.x
 						<< ", y = " << i_vertexArray[i].vertex.y << ", z = " << -i_vertexArray[i].vertex.z
+						<< ", nx = " << i_vertexArray[i].vertex.nx << ", ny = " << i_vertexArray[i].vertex.ny << ", nz = " << -i_vertexArray[i].vertex.nz
 						<< ", colorAt = \"vertex " << i + 1 << " Color \", r = " << i_vertexArray[i].vertex.r
 						<< ", g = " << i_vertexArray[i].vertex.g << ", b = " << i_vertexArray[i].vertex.b
 						<< ", a = " << i_vertexArray[i].vertex.a << ", u = " << i_vertexArray[i].vertex.u

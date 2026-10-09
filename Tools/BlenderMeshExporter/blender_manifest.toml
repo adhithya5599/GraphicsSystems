@@ -1,0 +1,21 @@
+schema_version = "1.0.0"
+
+# The add-on is installed as an extension from this manifest in Blender 4.2+
+# (bl_info in __init__.py is only used when it is installed as a legacy add-on)
+id = "eae6320_blender_mesh_exporter"
+version = "1.0.0"
+name = "AdhithyaNarayanan's EAE6320 Mesh Format"
+tagline = "Export meshes to the EAE6320 Lua mesh format"
+maintainer = "Adhithya Narayanan"
+type = "add-on"
+
+tags = ["Import-Export"]
+
+blender_version_min = "4.2.0"
+
+# Blender requires add-ons to use a GPL-compatible license
+license = ["SPDX:GPL-3.0-or-later"]
+
+# The exporter only writes the file that the user picks in the file browser
+[permissions]
+files = "Write exported mesh files to disk"

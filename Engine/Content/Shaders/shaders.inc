@@ -23,6 +23,7 @@
 	#define vec3 float3
 	#define vec4 float4
 	#define TransfromVector(i_vector1, i_vector2) mul(i_vector1, i_vector2)
+	// (GLSL is missing some HLSL functions; the GL versions are defined below)
 	#define gl_Position o_vertexPosition_projected
 	#define DeclareTexture( i_name, i_id ) Texture2D i_name : register( t##i_id );SamplerState i_name##_Sampler : register( s##i_id)
 	#define SamplerTexture( i_name, i_uv ) i_name.Sample( i_name##_Sampler, i_uv )
@@ -34,7 +35,11 @@
 	#define float2 vec2
 	#define float3 vec3
 	#define float4 vec4
-	#define TransfromVector(i_vector1, i_vector2) i_vector1 * i_vector2
+	// The parentheses matter: without them TransfromVector( m, v ).xyz would expand to m * v.xyz
+	#define TransfromVector(i_vector1, i_vector2) ( ( i_vector1 ) * ( i_vector2 ) )
+	// HLSL functions that GLSL calls by different names
+	#define saturate( i_value ) clamp( i_value, 0.0, 1.0 )
+	#define lerp mix
 	#define o_vertexPosition_projected gl_Position
 	#define DeclareTexture( i_name, i_id ) layout( binding = i_id ) uniform sampler2D i_name
 	#define SamplerTexture( i_name, i_uv ) texture( i_name, i_uv )
@@ -50,4 +55,7 @@ DeclareConstantBuffer(g_constantBuffer_frame, 0)
 	float g_elapsedSecondCount_simulationTime;
 	// For float4 alignment
 	float2 g_padding;
+
+	// The camera's position in world space (w is unused)
+	float4 g_cameraPosition_world;
 };

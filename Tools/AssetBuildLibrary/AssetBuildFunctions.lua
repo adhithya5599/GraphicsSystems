@@ -264,10 +264,17 @@ NewAssetTypeInfo( "shaders",
 			return "ShaderBuilder.exe"
 		end,
 		ShouldTargetBeBuilt = function( i_lastWriteTime_builtAsset )
-			-- If the shaders.inc file has changed since the last time this shader was built
+			-- If an included file has changed since the last time this shader was built
 			-- then it should be built again
-			local lastWriteTime_includeFile = GetLastWriteTime( EngineSourceContentDir .. "Shaders/shaders.inc" )
-			return lastWriteTime_includeFile > i_lastWriteTime_builtAsset
+			-- (the build system doesn't parse #includes, so every shared include file must be listed here;
+			-- otherwise editing lighting.inc would leave stale shaders that silently use the old code)
+			for _, includeFile in ipairs( { "Shaders/shaders.inc", "Shaders/lighting.inc" } ) do
+				local lastWriteTime_includeFile = GetLastWriteTime( EngineSourceContentDir .. includeFile )
+				if lastWriteTime_includeFile > i_lastWriteTime_builtAsset then
+					return true
+				end
+			end
+			return false
 		end
 	}
 )
@@ -301,6 +308,21 @@ NewAssetTypeInfo( "textures",
 		end,
 		GetBuilderRelativePath = function()
 			return "TextureBuilder.exe"
+		end
+	}
+)
+
+-- Lighting Asset Type
+----------------------
+
+-- A lighting file is a Lua table of lights (e.g. Lighting/scene.lighting)
+-- that LightingBuilder validates and converts into the binary file that Engine/Lighting loads.
+-- The built file keeps the same relative path and extension (the default behavior),
+-- so the Graphics system loads it from "data/Lighting/scene.lighting".
+NewAssetTypeInfo( "lighting",
+	{
+		GetBuilderRelativePath = function()
+			return "LightingBuilder.exe"
 		end
 	}
 )

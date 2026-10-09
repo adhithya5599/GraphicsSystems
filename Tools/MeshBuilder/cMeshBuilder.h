@@ -44,6 +44,10 @@ namespace eae6320
 
 		private:
 
+			// This is set by LoadVertexValues():
+			// true if the source file has a normal for every vertex,
+			// false if it has none (in which case Build() generates them)
+			bool m_doVerticesHaveNormals = false;
 		};
 	}
 }

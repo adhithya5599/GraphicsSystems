@@ -1,0 +1,56 @@
+--[[
+	This file describes all of the lighting in MyGame's scene
+
+	It is built by Tools/LightingBuilder into a binary file (data/Lighting/scene.lighting)
+	that the Graphics system loads at startup; the game code never touches it.
+	Edit a value, build BuildMyGameAssets (or the whole solution), and run the game to see the change.
+
+	Coordinates are in the engine's world space:
+		* +x is right, +y is up, and +z points toward the camera (which starts at 0, 0, 10)
+		* A Blender position ( x, y, z ) is ( x, z, y ) here (see Tools/BlenderMeshExporter)
+	The floor is at y = -1 and the monkey sits on it at x = 0, z = 2.
+
+	Every section and every value is optional: anything that is left out uses the default in Engine/Lighting/sLightingData.h.
+	Colors are { r, g, b } with each channel between 0 and 1; brightness is controlled separately by "intensity".
+]]
+
+return
+{
+	-- Ambient light stands in for all of the light bouncing around the scene.
+	-- Surfaces facing up get skyColor, surfaces facing down get groundColor, and everything in between blends the two.
+	-- This is what keeps the shadowed side of an object from being pitch black.
+	ambient =
+	{
+		skyColor = { 0.55, 0.65, 0.80 },	-- A cool blue, like light from an overcast sky
+		groundColor = { 0.30, 0.25, 0.20 },	-- A warm brown, like light bounced off the ground
+		intensity = 0.3,
+	},
+
+	-- The directional light is the "sun": infinitely far away, so every surface sees it from the same direction.
+	-- "direction" is the way the light travels (it doesn't need to be normalized).
+	-- { 0.5, -1.0, -0.6 } means it comes from the upper left, slightly in front of the scene, and shines down and away.
+	directional =
+	{
+		direction = { 0.5, -1.0, -0.6 },
+		color = { 1.0, 0.95, 0.85 },	-- Slightly warm white
+		intensity = 0.75,
+	},
+
+	-- Specular highlights are the shiny spots where a light reflects toward the camera.
+	-- (This applies to every surface until the engine has materials.)
+	specular =
+	{
+		intensity = 0.3,	-- 0 = completely matte
+		shininess = 48,	-- Higher = smaller, sharper highlights (8 looks like rough plastic, 256 like polished metal)
+	},
+
+	-- Point lights shine in every direction from a position and fade out to exactly zero at their range.
+	-- There can be at most 4 (Lighting::MaxPointLightCount).
+	pointLights =
+	{
+		-- A cool blue light just to the right of the monkey, which tints its right side and ear
+		{ position = { 2.2, 0.6, 2.2 }, color = { 0.35, 0.60, 1.00 }, intensity = 5.0, range = 5.0 },
+		-- A warm orange light low on the floor in front and to the left, which makes a visible pool of light
+		{ position = { -2.0, -0.5, 3.0 }, color = { 1.00, 0.50, 0.20 }, intensity = 4.0, range = 4.0 },
+	},
+}

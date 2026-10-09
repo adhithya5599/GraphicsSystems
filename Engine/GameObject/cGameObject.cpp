@@ -8,34 +8,11 @@
 
 eae6320::GameObject::cMyGameObject::cMyGameObject(Graphics::cMesh*& o_mesh, Graphics::cEffect*& o_effect)
 {
-	auto result = Results::Success;
-	cScopeGuard scopeGuard([&o_effect, &result, this, &o_mesh]
-		{
-			if (result)
-			{
-				EAE6320_ASSERT(m_Effect != nullptr);
-				o_effect = m_Effect;
-
-				EAE6320_ASSERT(m_Mesh != nullptr);
-				o_mesh = m_Mesh;
-			}
-			else
-			{
-				if (m_Effect)
-				{
-					m_Effect->DecrementReferenceCount();
-					m_Effect = nullptr;
-				}
-				o_effect = nullptr;
-
-				if (m_Mesh)
-				{
-					m_Mesh->DecrementReferenceCount();
-					m_Mesh = nullptr;
-				}
-				o_mesh = nullptr;
-			}
-		});
+	// The mesh and effect are loaded later (through GetMesh() and GetEffect()),
+	// so at this point there aren't any yet
+	// (this used to assert that they weren't null, which only passed because the pointers were uninitialized)
+	o_mesh = m_Mesh;
+	o_effect = m_Effect;
 	m_RigidBodyState = new Physics::sRigidBodyState();
 	m_RigidBodyState->position = Math::sVector(0.0f, 0.0f, 0.0f);
 }

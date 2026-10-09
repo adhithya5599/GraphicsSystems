@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+    The Blender exporter is a Python add-on, so there is nothing to compile.
+    Like the MayaMeshExporter project (which copies its .mll to MAYA_PLUG_IN_PATH),
+    building this project packages and installs the add-on:
+      * It always creates $(OutputDir)eae6320_blender_mesh_exporter.zip,
+        which can be installed with Blender's Preferences > Get Extensions > Install from Disk
+      * If the BLENDER_ADDON_PATH environment variable is set
+        (e.g. to %APPDATA%\Blender Foundation\Blender\4.2\scripts\addons)
+        the add-on is also copied there so that every build re-installs it
+  -->
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="__init__.py" />
+    <None Include="cBlenderMeshExporter.py" />
+    <None Include="blender_manifest.toml" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{adcedf4f-e22d-4bbe-b056-a98ada5599f6}</ProjectGuid>
+    <RootNamespace>BlenderMeshExporter</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Engine\EngineDefaults.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Engine\EngineDefaults.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <!-- This must match the id in blender_manifest.toml -->
+    <BlenderAddonName>eae6320_blender_mesh_exporter</BlenderAddonName>
+    <BlenderAddonPackage>$(OutputDir)$(BlenderAddonName).zip</BlenderAddonPackage>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <CustomBuildStep>
+      <Command>if not exist "$(OutputDir)" mkdir "$(OutputDir)"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Compress-Archive -Force -DestinationPath '$(BlenderAddonPackage)' -Path '$(ProjectDir)__init__.py','$(ProjectDir)cBlenderMeshExporter.py','$(ProjectDir)blender_manifest.toml'"
+if errorlevel 1 exit /b 1
+echo Packaged $(BlenderAddonPackage)
+if defined BLENDER_ADDON_PATH (
+  if not exist "%BLENDER_ADDON_PATH%\$(BlenderAddonName)" mkdir "%BLENDER_ADDON_PATH%\$(BlenderAddonName)"
+  copy /y "$(ProjectDir)__init__.py" "%BLENDER_ADDON_PATH%\$(BlenderAddonName)\" &gt;nul || exit /b 1
+  copy /y "$(ProjectDir)cBlenderMeshExporter.py" "%BLENDER_ADDON_PATH%\$(BlenderAddonName)\" &gt;nul || exit /b 1
+  echo Installed the Blender Mesh Exporter to %BLENDER_ADDON_PATH%\$(BlenderAddonName)
+) else (
+  echo BlenderMeshExporter : warning : BLENDER_ADDON_PATH isn't set so the add-on wasn't installed automatically. Install $(BlenderAddonPackage) with Blender's Preferences ^&gt; Get Extensions ^&gt; Install from Disk
+)</Command>
+      <Message>Installing Blender Mesh Exporter</Message>
+      <Inputs>$(ProjectDir)__init__.py;$(ProjectDir)cBlenderMeshExporter.py;$(ProjectDir)blender_manifest.toml</Inputs>
+      <Outputs>$(BlenderAddonPackage)</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

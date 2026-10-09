@@ -68,6 +68,12 @@ namespace eae6320
 			//		* These are values that are associated with a specific draw call
 			//		* The constant buffer must be updated and bound for every draw call that is made
 			DrawCall = 2,
+			//	* Lighting:
+			//		* These values describe every light in the scene (see Engine/Lighting)
+			//		* In this engine lights don't move, so the constant buffer is updated once at initialization
+			//			and bound once to the fragment shader stage;
+			//			if lights were animated it would be updated every frame like the Frame constant buffer
+			Lighting = 3,
 
 			Count,
 			Invalid = Count

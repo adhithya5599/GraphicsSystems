@@ -58,3 +58,10 @@ Thumbs.db
 #=====
 
 **/.mayaswatches
+
+# Blender
+#========
+
+# Backup files that Blender saves next to a .blend file
+*.blend1
+*.blend2
