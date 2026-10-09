@@ -50,14 +50,18 @@ DeclareConstantBuffer( g_constantBuffer_lighting, 3 )
 // so colors are converted to linear before lighting and back to sRGB afterwards.
 // (Skipping this makes lit objects look too dark with harsh, quickly-falling-off shading.
 // Raising to the power 2.2 is a close and cheap approximation of the exact sRGB curve.)
+// pow() is undefined for a negative base, and the Direct3D shader compiler reports an error (warning X3571 treated as an error)
+// unless it can prove that the base isn't negative, so the colors are clamped with saturate() first.
+// That doesn't change the result: colors are already in [0,1] going in,
+// and anything above 1 coming out can't be displayed anyway.
 float3 ConvertSrgbToLinear( float3 i_color_sRGB )
 {
-	return pow( i_color_sRGB, float3( 2.2, 2.2, 2.2 ) );
+	return pow( saturate( i_color_sRGB ), float3( 2.2, 2.2, 2.2 ) );
 }
 
 float3 ConvertLinearToSrgb( float3 i_color_linear )
 {
-	return pow( i_color_linear, float3( 1.0 / 2.2, 1.0 / 2.2, 1.0 / 2.2 ) );
+	return pow( saturate( i_color_linear ), float3( 1.0 / 2.2, 1.0 / 2.2, 1.0 / 2.2 ) );
 }
 
 // Lighting
@@ -79,6 +83,7 @@ void AccumulateLight( float3 i_normal, float3 i_directionToCamera, float3 i_dire
 	float3 halfVector = normalize( i_directionToLight + i_directionToCamera );
 	float normalDotHalf = saturate( dot( i_normal, halfVector ) );
 	// A surface that faces away from the light can't reflect it
+	// (normalDotHalf came from saturate(), so the compiler knows this pow() base isn't negative)
 	float specularAmount = ( normalDotLight > 0.0 ) ? pow( normalDotHalf, g_specular_shininess ) : 0.0;
 	io_specular += i_lightColor * ( specularAmount * g_specular_intensity );
 }

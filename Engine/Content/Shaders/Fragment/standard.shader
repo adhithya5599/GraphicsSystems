@@ -56,7 +56,7 @@ void main()
 	float4 albedo_sRGB = sampledColor * i_fragmentColor;
 	float3 albedo_linear = ConvertSrgbToLinear( albedo_sRGB.rgb );
 	float3 litColor_linear = CalculateLitColor( albedo_linear, i_fragmentNormal_world, i_fragmentPosition_world );
-	// The back buffer isn't an sRGB format, so the conversion back to sRGB must be done here.
-	// Anything brighter than 1 can't be displayed and is clamped.
-	o_color = float4( saturate( ConvertLinearToSrgb( litColor_linear ) ), albedo_sRGB.a );
+	// The back buffer isn't an sRGB format, so the conversion back to sRGB must be done here
+	// (ConvertLinearToSrgb() clamps anything brighter than 1, which can't be displayed)
+	o_color = float4( ConvertLinearToSrgb( litColor_linear ), albedo_sRGB.a );
 }
