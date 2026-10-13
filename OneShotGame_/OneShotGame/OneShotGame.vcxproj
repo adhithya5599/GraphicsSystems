@@ -19,34 +19,43 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resource Files\eaeAlien.ico" />
-    <Image Include="Resource Files\eaeGamePad.ico" />
-    <Image Include="Resource Files\vsDefault_large.ico" />
-    <Image Include="Resource Files\vsDefault_small.ico" />
+    <Image Include="Resource Files\target.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource Files\OneShotGame.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cArrow.h" />
+    <ClInclude Include="cCrowd.h" />
     <ClInclude Include="cKeyPressTracker.h" />
     <ClInclude Include="cObstacleCourse.h" />
+    <ClInclude Include="cQuiver.h" />
+    <ClInclude Include="cRound.h" />
+    <ClInclude Include="cScoreboard.h" />
     <ClInclude Include="cShotCameraRig.h" />
+    <ClInclude Include="cTarget.h" />
+    <ClInclude Include="cTimingLight.h" />
+    <ClInclude Include="cWind.h" />
     <ClInclude Include="cOneShotGame.h" />
     <ClInclude Include="GameplaySettings.h" />
-    <ClInclude Include="OneShotLock.h" />
     <ClInclude Include="sGameAssets.h" />
     <ClInclude Include="Resource Files\Resource.h" />
     <ClInclude Include="Resource Files\targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cArrow.cpp" />
+    <ClCompile Include="cCrowd.cpp" />
     <ClCompile Include="cKeyPressTracker.cpp" />
     <ClCompile Include="cObstacleCourse.cpp" />
+    <ClCompile Include="cQuiver.cpp" />
+    <ClCompile Include="cRound.cpp" />
+    <ClCompile Include="cScoreboard.cpp" />
     <ClCompile Include="cShotCameraRig.cpp" />
+    <ClCompile Include="cTarget.cpp" />
+    <ClCompile Include="cTimingLight.cpp" />
+    <ClCompile Include="cWind.cpp" />
     <ClCompile Include="cOneShotGame.cpp" />
     <ClCompile Include="EntryPoint.cpp" />
-    <ClCompile Include="OneShotLock.cpp" />
     <ClCompile Include="sGameAssets.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +64,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\Engine\Asserts\Asserts.vcxproj">
       <Project>{464a6551-fca9-4027-bd9e-2b26914782ab}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Engine\Audio\Audio.vcxproj">
+      <Project>{743cc011-a166-42c3-9c77-59093f81a320}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Engine\CameraControls\CameraControls.vcxproj">
       <Project>{b1bc2137-5872-43ad-9c51-529cf736cc29}</Project>

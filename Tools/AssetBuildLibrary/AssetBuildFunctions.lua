@@ -327,6 +327,26 @@ NewAssetTypeInfo( "lighting",
 	}
 )
 
+-- Sound Asset Type
+--------------------
+
+-- A sound is a .wav file (e.g. Sounds/bowRelease.wav)
+-- that SoundBuilder validates and converts into the binary file that Engine/Audio loads.
+-- The built file uses the extension ".sound" because it isn't a .wav file anymore,
+-- so a game loads "data/Sounds/bowRelease.sound".
+NewAssetTypeInfo( "sounds",
+	{
+		ConvertSourceRelativePathToBuiltRelativePath = function( i_sourceRelativePath )
+			local relativeDirectory, file = i_sourceRelativePath:match( "(.-)([^/\\]+)$" )
+			local fileName, extensionWithPeriod = file:match( "([^%.]+)(.*)" )
+			return relativeDirectory .. fileName .. ".sound"
+		end,
+		GetBuilderRelativePath = function()
+			return "SoundBuilder.exe"
+		end
+	}
+)
+
 -- Camera Asset Type
 NewAssetTypeInfo( "cameras",
 	{

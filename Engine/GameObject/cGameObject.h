@@ -69,7 +69,7 @@ namespace eae6320
 			// to make movement look smooth.
 			void SubmitToBeRendered( const float i_elapsedSecondCount_sinceLastSimulationUpdate );
 			// Submits this object with an explicit transform
-			// (for objects whose position doesn't come from their rigid body state, like a skybox that follows the camera)
+			// (for objects whose position doesn't come from their rigid body state, like a sky dome that follows the camera)
 			void SubmitToBeRendered( const Math::cMatrix_transformation& i_transform_localToWorld );
 
 			// Movement
@@ -77,6 +77,15 @@ namespace eae6320
 
 			Physics::sRigidBodyState& GetRigidBodyState() { return m_rigidBodyState; }
 			const Physics::sRigidBodyState& GetRigidBodyState() const { return m_rigidBodyState; }
+
+			// Scale
+			//------
+
+			// Stretches the mesh along its own axes when it is drawn
+			// (e.g. a 1 m rope mesh can be stretched to whatever length is needed).
+			// This only affects drawing: a rigid body has no size, so colliders must be scaled separately.
+			void SetScale( const Math::sVector& i_scale ) { m_scale = i_scale; }
+			const Math::sVector& GetScale() const { return m_scale; }
 
 			// Initialize / Clean Up
 			//----------------------
@@ -109,6 +118,8 @@ namespace eae6320
 			Texture::cTexture* m_texture = nullptr;
 
 			Physics::sRigidBodyState m_rigidBodyState;
+			// How much the mesh is stretched along each of its own (local) axes when it is drawn
+			Math::sVector m_scale = Math::sVector( 1.0f, 1.0f, 1.0f );
 		};
 	}
 }

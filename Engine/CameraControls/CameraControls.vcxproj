@@ -159,6 +159,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cCameraPath.h" />
     <ClInclude Include="cCameraTransition.h" />
     <ClInclude Include="cTrackingCamera.h" />
     <ClInclude Include="Serialization.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="Position\iPositionStrategy.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cCameraPath.cpp" />
     <ClCompile Include="cCameraTransition.cpp" />
     <ClCompile Include="cTrackingCamera.cpp" />
     <ClCompile Include="Orientation\cOrientationComposer.cpp" />

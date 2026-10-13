@@ -20,9 +20,13 @@ namespace
 	// Initialize / Clean Up
 	//----------------------
 
+	// If i_screenArea isn't null the window has no border and covers that area of the screen
+	// (and the resolution must be the size of that area)
 	eae6320::cResult CreateMainWindow( const HINSTANCE i_thisInstanceOfTheApplication, const char* const i_windowName, const ATOM i_windowClass,
-		const uint16_t i_resolutionWidth, const uint16_t i_resolutionHeight,
+		const uint16_t i_resolutionWidth, const uint16_t i_resolutionHeight, const RECT* const i_screenArea,
 		eae6320::Application::iApplication& io_application, HWND& o_window );
+	// Gets the area of the main monitor, in pixels
+	eae6320::cResult GetMainMonitorArea( RECT& o_area );
 	eae6320::cResult CreateMainWindowClass( const HINSTANCE i_thisInstanceOfTheApplication, const char* const i_mainWindowClassName,
 		WNDPROC fOnMessageReceivedFromWindows, ATOM& o_mainWindowClass,
 		const WORD* const i_iconId_large = nullptr, const WORD* const i_iconId_small = nullptr );
@@ -284,6 +288,17 @@ eae6320::cResult eae6320::Application::iApplication::Initialize_base( const sEnt
 	// Create the main window
 	{
 		uint16_t desiredResolutionWidth, desiredResolutionHeight;
+		RECT screenArea{};
+		const auto shouldFillTheScreen = ShouldMainWindowFillTheScreen() && GetMainMonitorArea( screenArea );
+		if ( shouldFillTheScreen )
+		{
+			// The resolution is the monitor's
+			// (the swap chain/back buffer is created at this size, so it must be decided before the window is created;
+			// resizing the window afterwards would stretch the image instead of adding pixels)
+			desiredResolutionWidth = static_cast<uint16_t>( screenArea.right - screenArea.left );
+			desiredResolutionHeight = static_cast<uint16_t>( screenArea.bottom - screenArea.top );
+		}
+		else
 		{
 			// Get the application's default
 			GetDefaultInitialResolution( desiredResolutionWidth, desiredResolutionHeight );
@@ -293,7 +308,7 @@ eae6320::cResult eae6320::Application::iApplication::Initialize_base( const sEnt
 		}
 		HWND window;
 		if ( result = CreateMainWindow( applicationInstance, GetMainWindowName(), m_mainWindowClass,
-			desiredResolutionWidth, desiredResolutionHeight,
+			desiredResolutionWidth, desiredResolutionHeight, shouldFillTheScreen ? &screenArea : nullptr,
 			*this, window ) )
 		{
 			// The new window handle should have been assigned to the application in OnMessageReceivedFromWindows() WM_CREATE
@@ -378,9 +393,10 @@ namespace
 	//----------------------
 
 	eae6320::cResult CreateMainWindow( const HINSTANCE i_thisInstanceOfTheApplication, const char* const i_windowName, const ATOM i_windowClass,
-		const uint16_t i_resolutionWidth, const uint16_t i_resolutionHeight,
+		const uint16_t i_resolutionWidth, const uint16_t i_resolutionHeight, const RECT* const i_screenArea,
 		eae6320::Application::iApplication& io_application, HWND& o_window )
 	{
+		const auto shouldFillTheScreen = i_screenArea != nullptr;
 		auto result = eae6320::Results::Success;
 
 		eae6320::cScopeGuard scopeGuard( [&o_window, &result]
@@ -398,19 +414,25 @@ namespace
 		// Create the window
 		{
 			// The window's style
-			constexpr DWORD windowStyle =
+			const DWORD windowStyle = shouldFillTheScreen
+				// A "pop-up" window has no border or title bar, so its client area is the whole window
+				// (the system menu is kept so that Alt+F4 still closes it)
+				? ( WS_POPUP | WS_SYSMENU )
+				:
 				// "Overlapped" is basically the same as "top-level"
-				WS_OVERLAPPED
+				( WS_OVERLAPPED
 				// The caption is the title bar when in windowed-mode
 				| WS_CAPTION
 				// The window should never change dimensions, so only a minimize box is allowed
 				| WS_MINIMIZEBOX
 				// The system menu appears when you right-click the title bar
-				| WS_SYSMENU;
+				| WS_SYSMENU );
 			// The window's extended style
-			constexpr DWORD windowStyle_extended =
+			const DWORD windowStyle_extended = shouldFillTheScreen
+				// (This keeps a borderless window on the taskbar)
+				? WS_EX_APPWINDOW
 				// The following is a macro to make the extended style the default top-level look
-				WS_EX_OVERLAPPEDWINDOW;
+				: WS_EX_OVERLAPPEDWINDOW;
 			// The width and height of the window.
 			// A game cares about the width and height of the actual "client area",
 			// which is the part of the window that doesn't include the borders and title bar;
@@ -418,12 +440,13 @@ namespace
 			// the actual window will be slightly bigger than that.
 			// Initially, then, the window will be created with default values that Windows chooses
 			// and then resized after creation)
-			constexpr int width = CW_USEDEFAULT;
-			constexpr int height = CW_USEDEFAULT;
+			// (A window that fills the screen is created exactly over the monitor instead)
+			const int width = shouldFillTheScreen ? static_cast<int>( i_resolutionWidth ) : CW_USEDEFAULT;
+			const int height = shouldFillTheScreen ? static_cast<int>( i_resolutionHeight ) : CW_USEDEFAULT;
 			// The initial position of the window
 			// (We don't care, and will let Windows decide)
-			constexpr int position_x = CW_USEDEFAULT;
-			constexpr int position_y = CW_USEDEFAULT;
+			const int position_x = shouldFillTheScreen ? static_cast<int>( i_screenArea->left ) : CW_USEDEFAULT;
+			const int position_y = shouldFillTheScreen ? static_cast<int>( i_screenArea->top ) : CW_USEDEFAULT;
 			// Handle to the parent of this window
 			// (Since this is our main window, it can't have a parent)
 			constexpr HWND parent = NULL;
@@ -452,6 +475,13 @@ namespace
 				eae6320::Logging::OutputError( "Windows failed to create the main window: %s", errorMessage.c_str() );
 				return result;
 			}
+		}
+
+		if ( shouldFillTheScreen )
+		{
+			// A window without a border was created at exactly the right size
+			eae6320::Logging::OutputMessage( "The main window fills the screen at %u x %u", i_resolutionWidth, i_resolutionHeight );
+			return result;
 		}
 
 		// Change the window's size based on the desired client area resolution
@@ -516,6 +546,28 @@ namespace
 		}
 
 		return result;
+	}
+
+	eae6320::cResult GetMainMonitorArea( RECT& o_area )
+	{
+		// Without this, Windows' display scaling (e.g. 150%) would report a smaller "virtual" screen size
+		// and then stretch the smaller image to fit the monitor, which looks blurry.
+		// Telling Windows that the application handles scaling itself makes it report (and draw at) the real number of pixels.
+		// (It must be called before any window is created, which is why it is here rather than at startup in general)
+		SetProcessDPIAware();
+		// The main monitor is the one that contains the point (0, 0)
+		const auto monitor = MonitorFromPoint( POINT{ 0, 0 }, MONITOR_DEFAULTTOPRIMARY );
+		MONITORINFO monitorInfo{};
+		monitorInfo.cbSize = sizeof( monitorInfo );
+		if ( ( monitor == NULL ) || ( GetMonitorInfoW( monitor, &monitorInfo ) == FALSE ) )
+		{
+			const auto errorMessage = eae6320::Windows::GetLastSystemError();
+			eae6320::Logging::OutputError( "Couldn't find the size of the main monitor (so the game will use a window instead): %s",
+				errorMessage.c_str() );
+			return eae6320::Results::Failure;
+		}
+		o_area = monitorInfo.rcMonitor;
+		return eae6320::Results::Success;
 	}
 
 	eae6320::cResult CreateMainWindowClass( const HINSTANCE i_thisInstanceOfTheApplication, const char* const i_mainWindowClassName,

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <Engine/Asserts/Asserts.h>
+#include <Engine/Audio/Audio.h>
 #include <Engine/Graphics/Graphics.h>
 #include <Engine/Logging/Logging.h>
 #include <Engine/ScopeGuard/cScopeGuard.h>
@@ -366,6 +367,16 @@ eae6320::cResult eae6320::Application::iApplication::Initialize_engine()
 			return result;
 		}
 	}
+	// Audio
+	{
+		// Unlike graphics, a game can still be played without sound,
+		// so a failure here is logged but doesn't stop the application
+		// (Audio::Initialize() already disables audio by itself if there is no audio device)
+		if ( !Audio::Initialize() )
+		{
+			Logging::OutputError( "Audio couldn't be initialized; the game will be silent" );
+		}
+	}
 
 	return result;
 }
@@ -460,6 +471,19 @@ eae6320::cResult eae6320::Application::iApplication::CleanUp_engine()
 {
 	auto result = Results::Success;
 
+	// Audio
+	// (this is cleaned up in the opposite order that it was initialized in)
+	{
+		const auto result_audio = Audio::CleanUp();
+		if ( !result_audio )
+		{
+			EAE6320_ASSERTF( false, "Audio wasn't successfully cleaned up" );
+			if ( result )
+			{
+				result = result_audio;
+			}
+		}
+	}
 	// Graphics
 	{
 		const auto result_graphics = Graphics::CleanUp();

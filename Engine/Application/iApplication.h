@@ -129,6 +129,11 @@ namespace eae6320
 				o_width = 720;
 				o_height = 720;
 			}
+			// An application can choose to fill the whole screen instead
+			// (a window without a border or title bar that covers the main monitor, at the monitor's resolution,
+			// which works the same way with Direct3D and OpenGL and still lets the player Alt+Tab to other windows).
+			// When this returns true the resolution is the monitor's, and the two resolution settings above are ignored.
+			virtual bool ShouldMainWindowFillTheScreen() const { return false; }
 
 			// The application's simulation is always updated in fixed increments of time
 			// to keep the simulation stable and predictable.

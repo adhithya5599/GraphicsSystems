@@ -3,11 +3,11 @@ return
     camera =
     {
         fieldOfViewRadians = { 1.0471976, 1.0471976 },
-        zNearPlane = 0.01,
-        -- The sky box is a cube 150 units from the camera to each side,
-        -- so its corners are about 260 units away (150 * the square root of 3);
-        -- a far plane closer than that cuts the corners off the sky
-        zFarPlane = 300.0,
+        -- 5 cm keeps the arrow (which starts 55 cm in front of the camera) visible
+        -- while giving the depth buffer enough precision for the far end of the range
+        zNearPlane = 0.05,
+        -- The sky dome (280 m) is always centered on the camera, so the far plane must be beyond it
+        zFarPlane = 320.0,
     },
     positionStrategy =
     {

@@ -9,16 +9,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resource Files\eaeAlien.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resource Files\eaeGamePad.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resource Files\vsDefault_large.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resource Files\vsDefault_small.ico">
+    <Image Include="Resource Files\target.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -38,10 +29,22 @@
     <ClInclude Include="cArrow.h">
       <Filter>Gameplay</Filter>
     </ClInclude>
+    <ClInclude Include="cCrowd.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
     <ClInclude Include="cKeyPressTracker.h">
       <Filter>Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="cObstacleCourse.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="cQuiver.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="cRound.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="cScoreboard.h">
       <Filter>Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="cShotCameraRig.h">
@@ -50,7 +53,13 @@
     <ClInclude Include="GameplaySettings.h">
       <Filter>Gameplay</Filter>
     </ClInclude>
-    <ClInclude Include="OneShotLock.h">
+    <ClInclude Include="cTarget.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="cTimingLight.h">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="cWind.h">
       <Filter>Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="sGameAssets.h">
@@ -63,16 +72,34 @@
     <ClCompile Include="cArrow.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
+    <ClCompile Include="cCrowd.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
     <ClCompile Include="cKeyPressTracker.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
     <ClCompile Include="cObstacleCourse.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
+    <ClCompile Include="cQuiver.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="cRound.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="cScoreboard.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
     <ClCompile Include="cShotCameraRig.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
-    <ClCompile Include="OneShotLock.cpp">
+    <ClCompile Include="cTarget.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="cTimingLight.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="cWind.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
     <ClCompile Include="sGameAssets.cpp">

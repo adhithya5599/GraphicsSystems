@@ -91,9 +91,11 @@ void main()
 	// Transform the normal into world space
 	{
 		// A w of 0 means "direction": the rotation applies but the translation doesn't.
-		// (Strictly, normals should use the inverse transpose of the local-to-world matrix,
-		// but game objects in this engine only ever rotate and translate, never scale,
-		// and for a rotation the inverse transpose is the matrix itself.)
+		// (Strictly, normals should use the inverse transpose of the local-to-world matrix.
+		// For rotation and translation that is the matrix itself, and so is a uniform scale (after normalizing).
+		// A non-uniform scale (cGameObject::SetScale()) tilts normals slightly the wrong way;
+		// the only things that are scaled like that (ropes and flags, stretched along their length) barely show it,
+		// so the extra matrix that the correct calculation would need isn't sent.)
 		float4 vertexNormal_world = TransfromVector( g_transform_localToWorld, float4( i_vertexNormal_local, 0.0 ) );
 		o_vertexNormal_world = vertexNormal_world.xyz;
 	}

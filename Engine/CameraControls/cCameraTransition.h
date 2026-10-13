@@ -41,12 +41,13 @@ namespace eae6320
 			bool IsBlending() const { return m_elapsedSecondCount < m_durationInSeconds; }
 			// How far from the start view to the destination view the blend is (0 = start, 1 = destination).
 			// This can be used to blend other camera settings (like the field of view) the same way.
-			float GetBlendWeight() const;
+			// (i_extraSeconds looks ahead of the last update, so a blend can be drawn smoothly between simulation updates)
+			float GetBlendWeight( const float i_extraSeconds = 0.0f ) const;
 
 			// Calculates the view that should be used right now:
 			// the start view while the blend begins, moving towards the destination view, and exactly the destination view once finished
 			void CalculateView( const Math::sVector& i_toPosition, const Math::cQuaternion& i_toOrientation,
-				Math::sVector& o_position, Math::cQuaternion& o_orientation ) const;
+				Math::sVector& o_position, Math::cQuaternion& o_orientation, const float i_extraSeconds = 0.0f ) const;
 
 			// Data
 			//=====

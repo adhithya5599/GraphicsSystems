@@ -45,7 +45,18 @@ void eae6320::GameObject::cGameObject::SetTexture( Texture::cTexture* const i_te
 
 void eae6320::GameObject::cGameObject::SubmitToBeRendered( const float i_elapsedSecondCount_sinceLastSimulationUpdate )
 {
-	SubmitToBeRendered( m_rigidBodyState.PredictFutureTransform( i_elapsedSecondCount_sinceLastSimulationUpdate ) );
+	const auto transform_rigidBody = m_rigidBodyState.PredictFutureTransform( i_elapsedSecondCount_sinceLastSimulationUpdate );
+	if ( ( m_scale.x == 1.0f ) && ( m_scale.y == 1.0f ) && ( m_scale.z == 1.0f ) )
+	{
+		SubmitToBeRendered( transform_rigidBody );
+	}
+	else
+	{
+		// The scale is applied first (in the mesh's own space) and then the rotation and translation,
+		// so the mesh stretches along its own axes rather than the world's
+		SubmitToBeRendered( Math::cMatrix_transformation::ConcatenateAffine( transform_rigidBody,
+			Math::cMatrix_transformation::CreateScale( m_scale.x, m_scale.y, m_scale.z ) ) );
+	}
 }
 
 void eae6320::GameObject::cGameObject::SubmitToBeRendered( const Math::cMatrix_transformation& i_transform_localToWorld )
@@ -77,7 +88,8 @@ eae6320::GameObject::cGameObject::cGameObject( cGameObject&& io_gameObject ) noe
 	m_mesh( std::exchange( io_gameObject.m_mesh, nullptr ) ),
 	m_effect( std::exchange( io_gameObject.m_effect, nullptr ) ),
 	m_texture( std::exchange( io_gameObject.m_texture, nullptr ) ),
-	m_rigidBodyState( io_gameObject.m_rigidBodyState )
+	m_rigidBodyState( io_gameObject.m_rigidBodyState ),
+	m_scale( io_gameObject.m_scale )
 {
 
 }
@@ -91,6 +103,7 @@ eae6320::GameObject::cGameObject& eae6320::GameObject::cGameObject::operator =( 
 		m_effect = std::exchange( io_gameObject.m_effect, nullptr );
 		m_texture = std::exchange( io_gameObject.m_texture, nullptr );
 		m_rigidBodyState = io_gameObject.m_rigidBodyState;
+		m_scale = io_gameObject.m_scale;
 	}
 	return *this;
 }

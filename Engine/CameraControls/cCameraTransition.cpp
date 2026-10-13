@@ -22,30 +22,31 @@ void eae6320::Camera::cCameraTransition::Update( const float i_elapsedSecondCoun
 	m_elapsedSecondCount = std::min( m_elapsedSecondCount + i_elapsedSecondCount, m_durationInSeconds );
 }
 
-float eae6320::Camera::cCameraTransition::GetBlendWeight() const
+float eae6320::Camera::cCameraTransition::GetBlendWeight( const float i_extraSeconds ) const
 {
-	if ( !IsBlending() )
+	const auto elapsedSecondCount = m_elapsedSecondCount + i_extraSeconds;
+	if ( elapsedSecondCount >= m_durationInSeconds )
 	{
 		return 1.0f;
 	}
 	// How far through the blend this is in time, from 0 to 1
-	const auto progress = m_elapsedSecondCount / m_durationInSeconds;
+	const auto progress = std::max( elapsedSecondCount, 0.0f ) / m_durationInSeconds;
 	// "Smoothstep" eases in and out: the camera starts moving slowly, speeds up, and then slows down as it arrives.
 	// A straight (linear) blend would start and stop moving instantly, which reads as a jolt.
 	return progress * progress * ( 3.0f - ( 2.0f * progress ) );
 }
 
 void eae6320::Camera::cCameraTransition::CalculateView( const Math::sVector& i_toPosition, const Math::cQuaternion& i_toOrientation,
-	Math::sVector& o_position, Math::cQuaternion& o_orientation ) const
+	Math::sVector& o_position, Math::cQuaternion& o_orientation, const float i_extraSeconds ) const
 {
-	if ( !IsBlending() )
+	const auto weight = GetBlendWeight( i_extraSeconds );
+	if ( weight >= 1.0f )
 	{
 		o_position = i_toPosition;
 		o_orientation = i_toOrientation;
 		return;
 	}
 
-	const auto weight = GetBlendWeight();
 	o_position = m_fromPosition + ( ( i_toPosition - m_fromPosition ) * weight );
 	// Orientations are blended with a spherical interpolation
 	// so that the camera turns at a steady rate along the shortest arc
